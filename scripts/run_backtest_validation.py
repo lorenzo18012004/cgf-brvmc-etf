@@ -706,11 +706,15 @@ def stress_with_selection(name, rebal_freq_months, fee=MGMT_FEE_ANN,
     wh_new = {}
     old_bsk_stress = {}
     for rb in rb_new:
-        past_dates = [d for d in brvm30_weights_hist if d <= rb]
-        closest = max(past_dates) if past_dates else min(brvm30_weights_hist.keys())
-        w_b30 = brvm30_weights_hist.get(closest, {})
         past_rd = [d for d in rebal_dates if d <= rb]
         closest_rd = max(past_rd) if past_rd else rebal_dates[0]
+        if brvm30_weights_hist:
+            past_dates = [d for d in brvm30_weights_hist if d <= rb]
+            closest = max(past_dates) if past_dates else (min(brvm30_weights_hist.keys()) if brvm30_weights_hist else rb)
+            w_b30 = brvm30_weights_hist.get(closest, {})
+        else:
+            # Pas de rebal_detail — utiliser w_history comme poids cible
+            w_b30 = _get_weights(w_history, closest_rd)
         bw = build_basket(rb, w_b30, aum, max_small, max_large, old_basket=old_bsk_stress)
         if bw:
             old_bsk_stress = dict(bw)
@@ -746,7 +750,7 @@ for threshold in [0.01, 0.02, 0.03, 0.05, 0.08, 0.10, 0.15]:
     old_bsk_thr = {}
     for rb in rebal_dates:
         _past = [d for d in brvm30_weights_hist if d <= rb]
-        closest = max(_past) if _past else min(brvm30_weights_hist.keys())
+        closest = max(_past) if _past else (min(brvm30_weights_hist.keys()) if brvm30_weights_hist else rb)
         w_b30 = brvm30_weights_hist.get(closest, {})
         bsk_thr = build_basket(rb, w_b30, AUM_MFCFA,
                                max_small=MAX_EXEC_SMALL, max_large=MAX_EXEC_LARGE,
@@ -762,7 +766,7 @@ for threshold in [0.01, 0.02, 0.03, 0.05, 0.08, 0.10, 0.15]:
     n_large_avg = int(np.mean([sum(1 for tk in wh_sim[d]
                                    if brvm30_weights_hist.get(
                                        max((x for x in brvm30_weights_hist if x <= d),
-                                           default=min(brvm30_weights_hist.keys())),{}
+                                           default=(min(brvm30_weights_hist.keys()) if brvm30_weights_hist else rb)),{}
                                    ).get(tk, 0) >= threshold)
                                for d in rebal_dates]))
     ewma_sensitivity.append({'threshold': threshold, 'te': round(te_f, 6),
@@ -831,7 +835,7 @@ for aum in AUM_PALIERS:
 
     for rb in rebal_dates:
         past = [d for d in brvm30_weights_hist if d <= rb]
-        closest = max(past) if past else min(brvm30_weights_hist.keys())
+        closest = max(past) if past else (min(brvm30_weights_hist.keys()) if brvm30_weights_hist else rb)
         w_b30 = brvm30_weights_hist.get(closest, {})
 
         bsk = build_basket(rb, w_b30, aum, MAX_EXEC_SMALL, MAX_EXEC_LARGE,

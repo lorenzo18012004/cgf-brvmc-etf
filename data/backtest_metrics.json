@@ -2,7 +2,75 @@
   "selection_params": {
     "methode": "Hybride OTC top-N + ADV-cap redistribution",
     "force_top_n": 5,
+    "force_top_n_note": "Top 5 titres BRVM30 tenus à leur poids exact via OTC (no ADV constraint)",
     "max_exec_large_days": 40,
-    "max_exec_small_days": 20
-  }
+    "max_exec_small_days": 20,
+    "large_threshold_pct": 3.0,
+    "participation_rate_pct": 15.0,
+    "min_adv_mfcfa": 0.5,
+    "min_basket_weight_pct": 0.1,
+    "rebal_cible_freq": "trimestriel (jan/avr/jul/oct)",
+    "rebal_execution_freq": "mensuel avec seuil de dérive",
+    "drift_threshold_pct": 1.0,
+    "drift_note": "Trade uniquement si |w_actuel - w_cible| > 1% pour un titre",
+    "spread_model": "variable selon ADV : 25 bps (>=100 MFCFA) → 175 bps (<5 MFCFA)",
+    "spread_25bps_above_mfcfa": 100,
+    "spread_40bps_above_mfcfa": 30,
+    "spread_80bps_above_mfcfa": 10,
+    "spread_125bps_above_mfcfa": 5,
+    "spread_175bps_below_mfcfa": 5,
+    "dividende_model": "Distribution semestrielle — reserve capitalisée au RF jusqu'au versement",
+    "dividende_ex_date": "1er juillet de l'année N+1 pour exercice N",
+    "dividende_placement_taux": 3.0,
+    "dividende_distribution": "dernier jour de bourse de juin et décembre",
+    "mgmt_fee_ann_pct": 0.6,
+    "aum_reference_mfcfa": 5000,
+    "cash_buffer_pct": 1.0,
+    "cash_buffer_note": "1% du NAV en cash, capitalisé au RF 3%/an"
+  },
+  "te_full": 0.040703,
+  "te_prog": 0.040112,
+  "td_full": 0.044586,
+  "td_full_ann": 0.013536,
+  "td_gross": 0.065854,
+  "td_gross_ann": 0.019852,
+  "turnover_avg": 0.045164,
+  "annual": [
+    {
+      "year": 2023,
+      "te": 0.039141,
+      "td": 0.052006,
+      "td_gross": 0.058533,
+      "cost_tx": 0,
+      "mgmt_fee": 0,
+      "basket_gap": 0.058533
+    },
+    {
+      "year": 2024,
+      "te": 0.037098,
+      "td": -0.050052,
+      "td_gross": -0.044135,
+      "cost_tx": 0,
+      "mgmt_fee": 0,
+      "basket_gap": -0.044135
+    },
+    {
+      "year": 2025,
+      "te": 0.044921,
+      "td": 0.051012,
+      "td_gross": 0.057508,
+      "cost_tx": 0,
+      "mgmt_fee": 0,
+      "basket_gap": 0.057508
+    },
+    {
+      "year": 2026,
+      "te": 0.043513,
+      "td": -0.005444,
+      "td_gross": -0.003922,
+      "cost_tx": 0,
+      "mgmt_fee": 0,
+      "basket_gap": -0.003922
+    }
+  ]
 }
