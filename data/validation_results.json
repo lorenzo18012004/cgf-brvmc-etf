@@ -2,39 +2,39 @@
   "stress_tests": [
     {
       "name": "Mensuel dérive 1% (référence)",
-      "te": 0.040568,
-      "td": 0.045951,
-      "turnover": 0.021843
+      "te": 0.019496,
+      "td": 0.01908,
+      "turnover": 0.025399
     },
     {
       "name": "Trimestriel classique",
-      "te": 0.040797,
-      "td": 0.006355,
-      "turnover": 0.029872
+      "te": 0.019048,
+      "td": -0.035498,
+      "turnover": 0.033599
     },
     {
       "name": "Mensuel dérive 0% (trade tout)",
-      "te": 0.03959,
-      "td": -0.017428,
-      "turnover": 0.091796
+      "te": 0.018607,
+      "td": -0.050812,
+      "turnover": 0.09501
     },
     {
       "name": "Mensuel dérive 2%",
-      "te": 0.039821,
-      "td": 0.077753,
-      "turnover": 0.006285
+      "te": 0.019199,
+      "td": 0.023027,
+      "turnover": 0.010011
     },
     {
       "name": "Trimestriel +frais ×2",
-      "te": 0.040797,
-      "td": -0.013846,
-      "turnover": 0.029872
+      "te": 0.019048,
+      "td": -0.056651,
+      "turnover": 0.033599
     },
     {
       "name": "Trimestriel 0-frais",
-      "te": 0.040797,
-      "td": 0.026845,
-      "turnover": 0.029872
+      "te": 0.019048,
+      "td": -0.014002,
+      "turnover": 0.033599
     }
   ],
   "ewma_sensitivity": [
@@ -90,45 +90,45 @@
   ],
   "bootstrap": {
     "n_sim": 500,
-    "te_med": 0.04064,
-    "te_p5": 0.03822,
-    "te_p95": 0.043137
+    "te_med": 0.018279,
+    "te_p5": 0.014302,
+    "te_p95": 0.022691
   },
   "walk_forward": [
     {
       "label": "Jan–Déc 2023",
-      "te_is": 0.039141,
-      "te_oos": 0.037121,
-      "td_oos": -0.05169,
-      "delta_te": -0.00202
+      "te_is": 0.016815,
+      "te_oos": 0.007496,
+      "td_oos": -0.01762,
+      "delta_te": -0.009319
     },
     {
       "label": "Jan–Déc 2024",
-      "te_is": 0.037121,
-      "te_oos": 0.044984,
-      "td_oos": 0.052396,
-      "delta_te": 0.007863
+      "te_is": 0.007496,
+      "te_oos": 0.016238,
+      "td_oos": 0.020037,
+      "delta_te": 0.008743
     },
     {
       "label": "Jan–Déc 2025",
-      "te_is": 0.044984,
-      "te_oos": 0.043856,
-      "td_oos": -0.005713,
-      "delta_te": -0.001128
+      "te_is": 0.016238,
+      "te_oos": 0.010831,
+      "td_oos": 0.0025,
+      "delta_te": -0.005408
     },
     {
       "label": "2023–2024 IS/2025 OOS",
-      "te_is": 0.038186,
-      "te_oos": 0.044984,
-      "td_oos": 0.052396,
-      "delta_te": 0.006798
+      "te_is": 0.013064,
+      "te_oos": 0.016238,
+      "td_oos": 0.020037,
+      "delta_te": 0.003174
     },
     {
       "label": "2023–2025 IS/2026 OOS",
-      "te_is": 0.040514,
-      "te_oos": 0.043856,
-      "td_oos": -0.005713,
-      "delta_te": 0.003342
+      "te_is": 0.014172,
+      "te_oos": 0.010831,
+      "td_oos": 0.0025,
+      "delta_te": -0.003342
     }
   ],
   "selection_params": {

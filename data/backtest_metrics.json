@@ -28,49 +28,49 @@
     "cash_buffer_pct": 1.0,
     "cash_buffer_note": "1% du NAV en cash, capitalisé au RF 3%/an"
   },
-  "te_full": 0.040703,
-  "te_prog": 0.040112,
-  "td_full": 0.044586,
-  "td_full_ann": 0.013536,
-  "td_gross": 0.065854,
-  "td_gross_ann": 0.019852,
-  "turnover_avg": 0.045164,
+  "te_full": 0.018762,
+  "te_prog": 0.01795,
+  "td_full": 0.020414,
+  "td_full_ann": 0.005698,
+  "td_gross": 0.043156,
+  "td_gross_ann": 0.011951,
+  "turnover_avg": 0.045232,
   "annual": [
     {
       "year": 2023,
-      "te": 0.039141,
-      "td": 0.052006,
-      "td_gross": 0.058533,
+      "te": 0.016815,
+      "td": 0.027058,
+      "td_gross": 0.03343,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": 0.058533
+      "basket_gap": 0.03343
     },
     {
       "year": 2024,
-      "te": 0.037098,
-      "td": -0.050052,
-      "td_gross": -0.044135,
+      "te": 0.007517,
+      "td": -0.018431,
+      "td_gross": -0.012317,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": -0.044135
+      "basket_gap": -0.012317
     },
     {
       "year": 2025,
-      "te": 0.044921,
-      "td": 0.051012,
-      "td_gross": 0.057508,
+      "te": 0.016207,
+      "td": 0.02022,
+      "td_gross": 0.026525,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": 0.057508
+      "basket_gap": 0.026525
     },
     {
       "year": 2026,
-      "te": 0.043513,
-      "td": -0.005444,
-      "td_gross": -0.003922,
+      "te": 0.034401,
+      "td": -0.007633,
+      "td_gross": -0.004239,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": -0.003922
+      "basket_gap": -0.004239
     }
   ]
 }

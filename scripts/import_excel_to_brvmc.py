@@ -35,7 +35,7 @@ QUARTER_DATES = [
     "2023-01-02", "2023-04-03", "2023-07-03", "2023-10-02",
     "2024-01-02", "2024-04-02", "2024-07-01", "2024-10-01",
     "2025-01-02", "2025-04-01", "2025-07-01", "2025-10-01",
-    "2026-01-02", "2026-04-01",
+    "2026-01-02", "2026-04-01", "2026-07-01",
 ]
 
 START_DATE   = "2023-01-01"
@@ -212,10 +212,10 @@ class ExcelImporter(BaseScript):
             for tk, hist in prices.items():
                 if tk not in societe:
                     continue
-                nb_flottants = societe[tk].get("nb_titres_flottants", 0)
-                if nb_flottants <= 0:
+                # Capitalisation totale (comme le BRVMCI officiel)
+                nb_total = societe[tk].get("nb_titres", 0)
+                if nb_total <= 0:
                     continue
-                # Chercher le prix à qd ou le dernier disponible avant qd
                 px = None
                 for delta in range(0, 6):
                     d_try = (date.fromisoformat(qd) - timedelta(days=delta)).isoformat()
@@ -223,7 +223,7 @@ class ExcelImporter(BaseScript):
                         px = hist[d_try]
                         break
                 if px and px > 0:
-                    cap_map[tk] = nb_flottants * px
+                    cap_map[tk] = nb_total * px
 
             if not cap_map:
                 continue

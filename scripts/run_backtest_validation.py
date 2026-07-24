@@ -18,6 +18,7 @@ Sorties :
   data/backtest_metrics.json
 """
 import sys, os, json, random
+from datetime import date
 import numpy as np
 import pandas as pd
 sys.stdout.reconfigure(encoding='utf-8')
@@ -49,7 +50,7 @@ RF_RATE_ANN         = 0.03   # Taux sans risque annuel (UEMOA) pour placement di
 CASH_BUFFER         = 0.01   # Poche de liquidité : 1% du NAV en cash (capitalisé au RF)
 
 START_DATE = '2023-01-02'
-END_DATE   = '2026-04-01'
+END_DATE   = date.today().isoformat()   # dynamique : jusqu'à aujourd'hui
 
 random.seed(42)
 np.random.seed(42)
@@ -742,16 +743,21 @@ stress_tests = [
 ]
 print("   Stress tests OK:", [s['name'] for s in stress_tests])
 
+# ── Helper : poids cible à une date (brvm30_weights_hist ou w_history) ────────
+def _b30_w(d):
+    if brvm30_weights_hist:
+        past = [x for x in brvm30_weights_hist if x <= d]
+        key  = max(past) if past else min(brvm30_weights_hist.keys())
+        return brvm30_weights_hist.get(key, {})
+    return _get_weights(w_history, d)
+
 # ── Sensibilité seuil grand titre (LARGE_THRESHOLD) ──────────────────────────
-# Teste différentes valeurs de LARGE_THRESHOLD : au-dessus du seuil = 40j max, en dessous = 20j
 ewma_sensitivity = []
 for threshold in [0.01, 0.02, 0.03, 0.05, 0.08, 0.10, 0.15]:
     wh_sim = {}
     old_bsk_thr = {}
     for rb in rebal_dates:
-        _past = [d for d in brvm30_weights_hist if d <= rb]
-        closest = max(_past) if _past else (min(brvm30_weights_hist.keys()) if brvm30_weights_hist else rb)
-        w_b30 = brvm30_weights_hist.get(closest, {})
+        w_b30 = _b30_w(rb)
         bsk_thr = build_basket(rb, w_b30, AUM_MFCFA,
                                max_small=MAX_EXEC_SMALL, max_large=MAX_EXEC_LARGE,
                                large_thr=threshold, old_basket=old_bsk_thr)
@@ -764,10 +770,7 @@ for threshold in [0.01, 0.02, 0.03, 0.05, 0.08, 0.10, 0.15]:
     te_f, td_f, _ = compute_te_td(nn, bench_s)
     to_f = turnover_avg(wh_sim, rebal_dates)
     n_large_avg = int(np.mean([sum(1 for tk in wh_sim[d]
-                                   if brvm30_weights_hist.get(
-                                       max((x for x in brvm30_weights_hist if x <= d),
-                                           default=(min(brvm30_weights_hist.keys()) if brvm30_weights_hist else rb)),{}
-                                   ).get(tk, 0) >= threshold)
+                                   if _b30_w(d).get(tk, 0) >= threshold)
                                for d in rebal_dates]))
     ewma_sensitivity.append({'threshold': threshold, 'te': round(te_f, 6),
                               'td': round(td_f, 6), 'turnover': round(to_f, 6),
@@ -834,9 +837,7 @@ for aum in AUM_PALIERS:
     old_bsk_sc = {}
 
     for rb in rebal_dates:
-        past = [d for d in brvm30_weights_hist if d <= rb]
-        closest = max(past) if past else (min(brvm30_weights_hist.keys()) if brvm30_weights_hist else rb)
-        w_b30 = brvm30_weights_hist.get(closest, {})
+        w_b30 = _b30_w(rb)
 
         bsk = build_basket(rb, w_b30, aum, MAX_EXEC_SMALL, MAX_EXEC_LARGE,
                            old_basket=old_bsk_sc)
