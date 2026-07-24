@@ -1,11 +1,11 @@
 """
-update_brvm30_history.py — Mise à jour quotidienne de l'historique BRVM30 officiel
-Extrait la valeur de clôture BRVM30 depuis les snapshots iNAV et scrape Sika en fallback.
+update_brvm30_history.py — Mise à jour quotidienne de l'historique BRVMC (indice composite)
+Source principale : sikafinance.com/marches/historiques/BRVMC
 Usage : python update_brvm30_history.py
 """
 
 import os, sys, json
-from datetime import date, datetime, timezone
+from datetime import date
 
 from base import BaseScript
 
@@ -24,70 +24,30 @@ class Brvm30HistoryUpdater(BaseScript):
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-    def _scrape_brvm30_fallback(self):
-        """Récupère la valeur du BRVM30 via le provider actif (fallback)."""
-        try:
-            sys.path.insert(0, self.scripts_dir)
-            from data_provider import get_provider
-            val = get_provider().get_brvm30_index()
-            if val:
-                print(f"  [provider fallback] BRVM30 = {val}")
-            return val
-        except Exception as e:
-            print(f"  [provider fallback] Erreur : {e}")
-        return None
-
     def run(self):
-        ih   = self._load('nav_intraday_history.json') or {}
+        sys.path.insert(0, self.scripts_dir)
+        from scrape_sika import SikaScraper
+
         brvm = self._load('brvm30_index_history.json') or {}
+        today_str = date.today().isoformat()
 
-        today_str  = date.today().isoformat()
-        now_utc_h  = datetime.now(timezone.utc).hour
-        market_closed = now_utc_h >= 16  # BRVM ferme à 15h30 UTC
-
-        updated = 0
-
-        for day, snaps in sorted(ih.items()):
-            if not snaps:
-                continue
-
-            # Ne jamais écraser une valeur déjà enregistrée pour un jour passé
-            if day in brvm and day < today_str:
-                continue
-
-            # Prendre la DERNIÈRE valeur brvm30_official du jour (= clôture)
-            val = None
-            for snap in reversed(snaps):
-                v = snap.get('brvm30_official')
-                if v:
-                    val = float(v)
-                    break
-
-            if val is None:
-                continue
-
-            # Pour today : n'enregistrer qu'après la clôture du marché
-            if day == today_str and not market_closed:
-                print(f"  {day} : marché encore ouvert, skip.")
-                continue
-
-            if brvm.get(day) != val:
-                brvm[day] = val
-                updated += 1
-                print(f"  {day} : {val}")
-
-        # Fallback provider pour today si toujours manquant après clôture
-        if today_str not in brvm and market_closed:
-            print(f"  {today_str} manquant après clôture — tentative via provider...")
-            fallback_val = self._scrape_brvm30_fallback()
-            if fallback_val:
-                brvm[today_str] = fallback_val
-                updated += 1
-                print(f"  {today_str} : {fallback_val} (via provider)")
+        # Source principale : page historiques/BRVMC sur Sika Finance
+        try:
+            hist_data = SikaScraper().scrape_brvmc_history()
+            new_entries = 0
+            for d, v in hist_data.items():
+                if d not in brvm or brvm[d] != v:
+                    brvm[d] = v
+                    new_entries += 1
+            today_val = hist_data.get(today_str)
+            print(f"  BRVMC Sika : {len(hist_data)} dates, {new_entries} nouvelles"
+                  + (f" — aujourd'hui : {today_val}" if today_val else ""))
+        except Exception as e:
+            print(f"  [WARN] Scraping BRVMC echoue : {e}")
 
         brvm_sorted = dict(sorted(brvm.items()))
         self._save('brvm30_index_history.json', brvm_sorted)
-        print(f"brvm30_index_history.json mis à jour : {updated} entrée(s). Total : {len(brvm_sorted)} jours.")
+        print(f"brvm30_index_history.json mis a jour. Total : {len(brvm_sorted)} jours.")
         return brvm_sorted
 
 

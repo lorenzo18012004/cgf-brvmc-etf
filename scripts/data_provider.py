@@ -59,6 +59,10 @@ class BRVMDataProvider(ABC):
         Retourne None si la valeur n'est pas disponible.
         """
 
+    def get_brvmc_index(self) -> "float | None":
+        """Valeur courante de l'indice BRVM Composite. Retourne None si indisponible."""
+        return None
+
     @abstractmethod
     def update_price_history(self, tickers: "list | None" = None) -> dict:
         """
@@ -115,6 +119,10 @@ class SikaProvider(BRVMDataProvider):
     def get_brvm30_index(self) -> "float | None":
         from scrape_sika import scrape_brvm30_index
         return scrape_brvm30_index(self._get_html())
+
+    def get_brvmc_index(self) -> "float | None":
+        from scrape_sika import scrape_brvmc_index
+        return scrape_brvmc_index(self._get_html())
 
     def update_price_history(self, tickers: "list | None" = None) -> dict:
         from scrape_sika_history import SikaHistoryScraper

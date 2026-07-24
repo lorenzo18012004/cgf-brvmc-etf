@@ -43,6 +43,7 @@ class SikaScraper(BaseScript):
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         }
         self.brvm30_hist_url  = 'https://www.sikafinance.com/marches/historiques/BRVM30'
+        self.brvmc_hist_url   = 'https://www.sikafinance.com/marches/historiques/BRVMC'
         self.brvm30_hist_file = os.path.join(self.data_dir, 'brvm30_index_history.json')
         self.richbourse_history = os.path.join(self.data_dir, 'richbourse_history.json')
 
@@ -105,6 +106,49 @@ class SikaScraper(BaseScript):
         hist[str(trade_date)] = round(value, 4)
         with open(self.brvm30_hist_file, 'w', encoding='utf-8') as f:
             json.dump(hist, f, ensure_ascii=False, indent=2)
+
+    def scrape_brvmc_history(self, max_rows=500):
+        """Scrape la page historiques/BRVMC et retourne {date_iso: close_value}."""
+        html = self._fetch_html(self.brvmc_hist_url)
+        soup = BeautifulSoup(html, 'html.parser')
+        result = {}
+        for table in soup.find_all('table'):
+            rows = table.find_all('tr')
+            for row in rows[1:max_rows]:
+                cells = [td.get_text(strip=True).replace('\xa0', '').replace(' ', '') for td in row.find_all(['td', 'th'])]
+                if len(cells) < 2:
+                    continue
+                m = re.match(r'(\d{2})/(\d{2})/(\d{4})', cells[0])
+                if not m:
+                    continue
+                date_iso = f"{m.group(3)}-{m.group(2)}-{m.group(1)}"
+                try:
+                    close_val = float(cells[1].replace(',', '.'))
+                    if 50 < close_val < 5000:
+                        result[date_iso] = round(close_val, 4)
+                except ValueError:
+                    continue
+            if result:
+                break
+        return result
+
+    def scrape_brvmc_index(self, html):
+        """Extrait la valeur courante de l'indice BRVMC depuis la page aaz."""
+        soup = BeautifulSoup(html, 'html.parser')
+        for a in soup.find_all('a', href=re.compile(r'/marches/cotation_BRVMC', re.I)):
+            row = a.find_parent('tr')
+            if not row:
+                continue
+            cells = row.find_all(['td', 'th'])
+            for cell in reversed(cells):
+                txt = cell.get_text(strip=True).replace('\xa0', '').replace(' ', '').replace(',', '.')
+                try:
+                    val = float(txt)
+                    if 50 < val < 5000:
+                        return val
+                except ValueError:
+                    continue
+        return None
 
     def scrape_brvm30_index(self, html):
         """
@@ -379,7 +423,7 @@ class SikaScraper(BaseScript):
 
         if source == 'sika':
             try:
-                hist_data = self.scrape_brvm30_history()
+                hist_data = self.scrape_brvmc_history()
                 if hist_data:
                     existing_hist = {}
                     if os.path.exists(self.brvm30_hist_file):
@@ -392,10 +436,10 @@ class SikaScraper(BaseScript):
                     with open(self.brvm30_hist_file, 'w', encoding='utf-8') as _f:
                         json.dump(existing_hist, _f, ensure_ascii=False, indent=2)
                     today_val = hist_data.get(str(trade_date))
-                    print(f"  BRVM30 historique : {len(hist_data)} dates récupérées"
+                    print(f"  BRVMC historique : {len(hist_data)} dates recuperees"
                           + (f" — aujourd'hui : {today_val}" if today_val else ""))
             except Exception as _e:
-                print(f"  [WARN] BRVM30 historique non récupéré : {_e}")
+                print(f"  [WARN] BRVMC historique non recupere : {_e}")
 
         summary = self.update_excel(scraped, trade_date, existing, dry_run=dry_run)
         summary['source'] = source
@@ -414,6 +458,9 @@ def scrape_prices(html):
 
 def scrape_brvm30_index(html):
     return SikaScraper().scrape_brvm30_index(html)
+
+def scrape_brvmc_index(html):
+    return SikaScraper().scrape_brvmc_index(html)
 
 
 if __name__ == '__main__':
