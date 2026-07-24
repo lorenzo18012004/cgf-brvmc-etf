@@ -1763,12 +1763,16 @@ def _render_backtest():
                     _bi = next((b for b in _basket_sel if b["ticker"] == tk), {})
                     _tag = " OTC" if tk in _forced_tks else ""
                     _w_etf  = v * 100
-                    _w_b30  = _bi.get('w_brvm30', 0) * 100 if _bi else 0.0
+                    # Poids indice : depuis rebal_detail si dispo, sinon w_history (BRVMC)
+                    if _bi and _bi.get('w_brvm30', 0) > 0:
+                        _w_b30 = _bi.get('w_brvm30', 0) * 100
+                    else:
+                        _w_b30 = wh.get(sel_date, {}).get(tk, 0) * 100
                     _capped = _w_b30 > 0 and (_w_etf < _w_b30 - 0.05) and tk not in _forced_tks
                     _basket_rows.append({
                         "Titre":         tk + _tag,
                         "Poids ETF":     f"{_w_etf:.2f}%",
-                        "Poids indice":  f"{_w_b30:.2f}%" if _bi else "—",
+                        "Poids indice":  f"{_w_b30:.2f}%" if _w_b30 > 0 else "—",
                         "Capé ADV":      "⚠ oui" if _capped else "",
                         "ADV (M FCFA)":  f"{_bi.get('adv_mfcfa', 0):.1f}" if _bi else "—",
                     })
