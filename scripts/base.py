@@ -1,5 +1,5 @@
 """
-Classe de base pour tous les scripts CGF BRVMC ETF.
+Classe de base pour tous les scripts CGF BRVM30 ETF.
 Fournit les chemins standardisés et les helpers JSON.
 """
 import json
