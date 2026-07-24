@@ -1,0 +1,47 @@
+{
+  "rebal_date": "2026-07-01",
+  "scrape_ts": "2026-07-02 09:23",
+  "n_tickers": 30,
+  "composition": [
+    "BICB",
+    "BOAB",
+    "BOABF",
+    "BOAC",
+    "BOAM",
+    "BOAN",
+    "BOAS",
+    "CBIBF",
+    "CFAC",
+    "CIEC",
+    "ECOC",
+    "ETIT",
+    "NEIC",
+    "NSBC",
+    "ORAC",
+    "ORGT",
+    "SAFC",
+    "SCRC",
+    "SDSC",
+    "SEMC",
+    "SGBC",
+    "SIBC",
+    "SIVC",
+    "SNTS",
+    "SOGC",
+    "SPHC",
+    "STAC",
+    "STBC",
+    "TTLC",
+    "UNXC"
+  ],
+  "entries": [
+    "NSBC",
+    "SAFC",
+    "SOGC"
+  ],
+  "exits": [
+    "FTSC",
+    "ONTBF",
+    "SHEC"
+  ]
+}
