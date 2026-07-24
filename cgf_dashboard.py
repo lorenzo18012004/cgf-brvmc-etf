@@ -929,7 +929,7 @@ def _build_excel_complet(_cache_key = ""):
                 lp = _pts[-1]
                 _ih_lookup[_d] = {
                     "NAV_indice":        lp.get("nav_indice"),
-                    "BRVM30_officiel":   lp.get("brvm30_official"),
+                    "BRVMCI_officiel":   lp.get("brvm30_official"),
                     "Perf_lancement_%":  lp.get("perf_since_launch"),
                     "Var_1j_%":          lp.get("change_1d_pct"),
                     "AUM_MFCFA":         lp.get("aum_mfcfa"),
@@ -1238,7 +1238,7 @@ if _page in ("live", "backtest"):
         try:
             _xl_key = dd.get("metrics", {}).get("te", "") or pd.Timestamp.now().strftime("%Y-%m-%d")
             st.download_button("Export Excel complet", data=_build_excel_complet(_xl_key),
-                file_name=f"CGF_BRVM30_ETF_export_{pd.Timestamp.now().strftime('%Y-%m-%d')}.xlsx",
+                file_name=f"CGF_BRVMC_ETF_export_{pd.Timestamp.now().strftime('%Y-%m-%d')}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 use_container_width=True, key="dl_xl_hdr")
         except Exception as _xe:
@@ -1278,7 +1278,7 @@ def _render_backtest():
         m = dd.get("metrics", {})
         c1, c2, c3, c4, c5, c6, c7, c8 = st.columns(8)
         c1.metric("TE progressive T+3", pct(bm.get("te_t3", m.get("te")), sign=False), help="TE réaliste : exécution étalée sur l'ADV + décalage règlement T+3 BRVM (ventes J0, achats J+3, cash en transit gagne 0%)")
-        c2.metric("TD cumulé",      pct(m.get("td")),                 help="ETF PR nette vs BRVM30 PR — période complète")
+        c2.metric("TD cumulé",      pct(m.get("td")),                 help="ETF PR nette vs BRVMCI PR — période complète")
         c3.metric("TD /an",         pct(m.get("td_ann")),             help="TD net annualisé")
         c4.metric("Rebalancements", str(bm.get("n_rebal", "—")))
         c5.metric("Titres moy.",    str(bm.get("n_titres_avg", "—")))
@@ -1309,7 +1309,7 @@ def _render_backtest():
 
     <div style="margin-bottom:16px">
       <div style="font-size:0.72rem;font-weight:600;color:var(--c-navy);margin-bottom:6px">Top {_top_n} titres — OTC</div>
-      <div style="font-size:0.78rem;color:var(--c-text2);line-height:1.6">Tenus à leur <strong>poids exact BRVM30</strong> via bloc OTC négocié. Aucune contrainte de liquidité.</div>
+      <div style="font-size:0.78rem;color:var(--c-text2);line-height:1.6">Tenus à leur <strong>poids exact BRVMCI</strong> via bloc OTC négocié. Aucune contrainte de liquidité.</div>
     </div>
 
     <div style="margin-bottom:16px">
@@ -1319,11 +1319,11 @@ def _render_backtest():
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
         <div style="background:#f7f5f0;border:1px solid var(--c-border);padding:8px 10px;border-radius:2px;text-align:center">
-          <div style="font-size:0.6rem;color:var(--c-muted);margin-bottom:2px">Grands ≥ {_thr_pct}% BRVM30</div>
+          <div style="font-size:0.6rem;color:var(--c-muted);margin-bottom:2px">Grands ≥ {_thr_pct}% BRVMCI</div>
           <div style="font-size:1.1rem;font-weight:700;color:var(--c-navy)">{_n_large} j</div>
         </div>
         <div style="background:#f7f5f0;border:1px solid var(--c-border);padding:8px 10px;border-radius:2px;text-align:center">
-          <div style="font-size:0.6rem;color:var(--c-muted);margin-bottom:2px">Petits &lt; {_thr_pct}% BRVM30</div>
+          <div style="font-size:0.6rem;color:var(--c-muted);margin-bottom:2px">Petits &lt; {_thr_pct}% BRVMCI</div>
           <div style="font-size:1.1rem;font-weight:700;color:var(--c-navy)">{_n_small} j</div>
         </div>
       </div>
@@ -1446,7 +1446,7 @@ def _render_backtest():
         nav_b = nav_b_full.loc[start_dt:end_dt]
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=nav_b.index, y=nav_b.values,
-            name="BRVM30 PR", line=dict(color=BENCH_COLOR, width=1.5, dash="dot")))
+            name="BRVMCI PR", line=dict(color=BENCH_COLOR, width=1.5, dash="dot")))
         fig.add_trace(go.Scatter(x=nav_e.index, y=nav_e.values,
             name="ETF NAV nette", line=dict(color=COLOR, width=2)))
         fig.update_layout(**PLOTLY_LAYOUT, height=280,
@@ -1457,7 +1457,7 @@ def _render_backtest():
         _section("Décomposition Tracking Difference")
         td_items = {
             "TD net total":              m.get("td", 0),
-            "ETF brut vs BRVM30 PR":     m.get("td_gross", 0),
+            "ETF brut vs BRVMCI PR":     m.get("td_gross", 0),
             "dont Frais de gestion":     m.get("td", 0) - m.get("td_gross", 0),
         }
         st.dataframe(pd.DataFrame([{"Composante": k, "Valeur": pct(v)} for k, v in td_items.items()]),
@@ -1473,7 +1473,7 @@ def _render_backtest():
 
         fig_main = go.Figure()
         fig_main.add_trace(go.Scatter(x=nav_b.index, y=nav_b.values,
-            name="BRVM30 PR", line=dict(color=BENCH_COLOR, width=1.5, dash="dot")))
+            name="BRVMCI PR", line=dict(color=BENCH_COLOR, width=1.5, dash="dot")))
         fig_main.add_trace(go.Scatter(x=nav_e.index, y=nav_e.values,
             name="NAV nette", line=dict(color=COLOR, width=2.5)))
         if len(nav_g):
@@ -1517,14 +1517,14 @@ def _render_backtest():
                     legend=dict(orientation="h", y=-0.3), hovermode="x unified")
                 st.plotly_chart(fig_ann, width='stretch')
 
-        _section("Écart cumulé ETF NAV nette vs BRVM30 PR")
+        _section("Écart cumulé ETF NAV nette vs BRVMCI PR")
         nav_g2 = to_series(dd.get("nav_etf")).loc[start_dt:end_dt]
         nav_b2 = nav_b_full.loc[start_dt:end_dt]
         common = nav_g2.index.intersection(nav_b2.index)
         ar = (nav_g2.loc[common] / nav_b2.loc[common] - 1) * 100
         fig_ar = go.Figure()
         fig_ar.add_trace(go.Scatter(x=ar.index, y=ar.values,
-            name="Écart ETF vs BRVM30 PR", line=dict(color=COLOR, width=2),
+            name="Écart ETF vs BRVMCI PR", line=dict(color=COLOR, width=2),
             fill="tozeroy", fillcolor=ACCENT))
         fig_ar.add_hline(y=0, line_color="#e5e7eb", line_width=1)
         fig_ar.update_layout(**PLOTLY_LAYOUT, height=260, hovermode="x unified", yaxis_title="Écart (%)", showlegend=False)
@@ -1542,7 +1542,7 @@ def _render_backtest():
         _DV_TK     = {"TOTC": "TTLC", "VIVC": "SHEC", "TOSG": None, "NLCI": None}
         _DV_TK_REV = {v: k for k, v in _DV_TK.items() if v}  # TTLC→TOTC, SHEC→VIVC
 
-        # Poids BRVM30 par date de rebalancement (basket + excluded)
+        # Poids BRVMCI par date de rebalancement (basket + excluded)
         _b30_wh = {}
         for _rv in _rd_dv.get("rebalancings", []):
             _dtr = _rv.get("date")
@@ -1604,7 +1604,7 @@ def _render_backtest():
             _div_rows_dv.append({
                 "Exercice":          _yr,
                 "Ex-date (conv.)":   _exd,
-                "Rend. div. BRVM30": f"{_br_y*100:.2f}%",
+                "Rend. div. BRVMCI": f"{_br_y*100:.2f}%",
                 "Rend. div. ETF":    f"{_et_y*100:.2f}%",
                 "Gap (pp)":          f"{(_et_y - _br_y)*100:+.2f}",
                 "Cash ETF (M FCFA)": f"{_cash:.1f}",
@@ -1626,9 +1626,9 @@ def _render_backtest():
         # Graphe 4 courbes
         _fig_tr = go.Figure()
         _fig_tr.add_trace(go.Scatter(x=nav_b.index, y=nav_b.values,
-            name="BRVM30 PR", line=dict(color=BENCH_COLOR, width=1.5, dash="dot")))
+            name="BRVMCI PR", line=dict(color=BENCH_COLOR, width=1.5, dash="dot")))
         _fig_tr.add_trace(go.Scatter(x=_nav_b_tr.index, y=_nav_b_tr.values,
-            name="BRVM30 TR", line=dict(color=BENCH_COLOR, width=2.5)))
+            name="BRVMCI TR", line=dict(color=BENCH_COLOR, width=2.5)))
         _fig_tr.add_trace(go.Scatter(x=nav_e.index, y=nav_e.values,
             name="ETF PR (net frais)", line=dict(color=COLOR, width=1.5, dash="dot")))
         _fig_tr.add_trace(go.Scatter(x=_nav_e_tr.index, y=_nav_e_tr.values,
@@ -1647,7 +1647,7 @@ def _render_backtest():
             _n_yr_d = len(_yields_dv)
             _gap_pp = (_tot_et - _tot_br) * 100
             _ck1, _ck2, _ck3, _ck4 = st.columns(4)
-            _ck1.metric("Rend. div. BRVM30 (cumulé)", f"{_tot_br*100:.2f}%",
+            _ck1.metric("Rend. div. BRVMCI (cumulé)", f"{_tot_br*100:.2f}%",
                         help="Somme des rendements dividendes de l'indice sur toute la période")
             _ck2.metric("Rend. div. ETF (cumulé)",    f"{_tot_et*100:.2f}%",
                         delta=f"{_gap_pp:+.2f} pp vs indice",
@@ -1686,7 +1686,7 @@ def _render_backtest():
             yaxis_title="TE (%)", hovermode="x unified", showlegend=False)
         st.plotly_chart(fig_te, width='stretch')
 
-        _section("Distribution des écarts hebdomadaires ETF vs BRVM30 PR")
+        _section("Distribution des écarts hebdomadaires ETF vs BRVMCI PR")
         act2 = (gw.loc[cw].pct_change() - bw.loc[cw].pct_change()).dropna() * 100
         fig_hist = go.Figure()
         fig_hist.add_trace(go.Histogram(x=act2.values, nbinsx=30, marker_color=COLOR, opacity=0.75))
@@ -1795,7 +1795,7 @@ def _render_backtest():
                     if "Float" in r:
                         return "Float trop petit (< 7 Md FCFA)"
                     if "Absent" in r:
-                        return "Absent de l'indice BRVM30 à cette date"
+                        return "Absent de l'indice BRVMCI à cette date"
                     if stale is not None and stale >= 0.70:
                         return f"Prix stale : {stale*100:.0f}% de jours sans cotation (3 mois)"
                     if "ADV limité" in r or "ADV insuffisant" in r or "consécutifs" in r:
@@ -1832,7 +1832,7 @@ def _render_backtest():
                 legend=dict(orientation="h", y=-0.3))
             st.plotly_chart(fig_bar, width='stretch')
 
-    # ── Composition de l'indice BRVM30 ────────────────────────────────────────
+    # ── Composition de l'indice BRVMCI ────────────────────────────────────────
     elif _bsec == "indice":
         rd_idx = load_json(os.path.join(BRVM30_DIR, "rebal_detail.json"))
         if not rd_idx or not rd_idx.get("rebalancings"):
@@ -1840,7 +1840,7 @@ def _render_backtest():
         else:
             rebals_idx = rd_idx["rebalancings"]
 
-            # Reconstructs full BRVM30 = basket (in ETF) + excluded (in index but liquid-filtered)
+            # Reconstructs full BRVMCI = basket (in ETF) + excluded (in index but liquid-filtered)
             index_hist  = {}
             sector_map  = {}
             for r in rebals_idx:
@@ -1890,7 +1890,7 @@ def _render_backtest():
                     text=[f"{v*100:.1f}%" for v in w_sel.values], textposition="outside",
                 ))
                 fig_bidx.update_layout(**PLOTLY_LAYOUT, height=380,
-                    title=f"BRVM30 — {sel_date_idx}",
+                    title=f"BRVMCI — {sel_date_idx}",
                     xaxis_tickangle=-45, yaxis_title="Poids (%)", showlegend=False,
                     annotations=[dict(x=0.99, y=0.98, xref="paper", yref="paper",
                         text="Bleu = dans ETF · Gris = exclu liquidité",
@@ -1901,7 +1901,7 @@ def _render_backtest():
                               for b in (rd_rebal_idx.get("basket", []) if rd_rebal_idx else [])}
                 df_w_idx = pd.DataFrame({
                     "Ticker":       w_sel.index,
-                    "Poids BRVM30": [f"{v*100:.2f}%" for v in w_sel.values],
+                    "Poids BRVMCI": [f"{v*100:.2f}%" for v in w_sel.values],
                     "Cible ETF %":  [f"{_w_etf_idx[t]:.2f}%" if t in _w_etf_idx else "exclu"
                                      for t in w_sel.index],
                     "Secteur":      [sector_map.get(t, "—") for t in w_sel.index],
@@ -1909,7 +1909,7 @@ def _render_backtest():
                 })
                 st.dataframe(df_w_idx, width='stretch', hide_index=True, height=360)
 
-            _section("Evolution des poids BRVM30 par rebalancement")
+            _section("Evolution des poids BRVMCI par rebalancement")
             df_idx_full = pd.DataFrame(
                 {d: pd.Series(index_hist[d]) for d in dates_idx}
             ).T.fillna(0) * 100
@@ -1925,7 +1925,7 @@ def _render_backtest():
                 legend=dict(orientation="h", y=-0.4))
             st.plotly_chart(fig_stk, width='stretch')
 
-            _section("Rotations dans l'indice BRVM30")
+            _section("Rotations dans l'indice BRVMCI")
             rot_rows = []
             for i in range(1, len(rebals_idx)):
                 prev_t_idx = set(index_hist[dates_idx[i-1]].keys())
@@ -2344,10 +2344,10 @@ def _render_backtest():
                  "Ils sont mis en réserve et versés aux porteurs le dernier jour ouvré de juin et de décembre. "
                  "La NAV reflète uniquement la performance prix du panier (hors dividendes reçus).")
 
-        _lx("Benchmark BRVM30 PR (Price Return)",
-            r"\text{Bench}_t = \frac{\text{BRVM30\_PR}_t}{\text{BRVM30\_PR}_{t_0}} \times 100",
+        _lx("Benchmark BRVMCI PR (Price Return)",
+            r"\text{Bench}_t = \frac{\text{BRVMCI\_PR}_t}{\text{BRVMCI\_PR}_{t_0}} \times 100",
             legend=[
-                "BRVM30_PR_t = valeur de l'indice BRVM30 Price Return au jour t",
+                "BRVMCI_PR_t = valeur de l'indice BRVMCI Price Return au jour t",
                 "t_0 = premier jour du backtest (2023-01-02)",
                 "Base 100 = valeur 100 au démarrage du backtest",
             ],
@@ -2362,7 +2362,7 @@ def _render_backtest():
             legend=[
                 "TE = tracking error annualisée (mesure la volatilité de l'écart ETF vs indice)",
                 "r_t^ETF = rendement journalier de la NAV nette de l'ETF",
-                "r_t^Bench = rendement journalier de l'indice BRVM30 PR",
+                "r_t^Bench = rendement journalier de l'indice BRVMCI PR",
                 "σ = écart-type empirique des écarts journaliers (ddof=1)",
                 "√252 = facteur d'annualisation (252 jours ouvrés par an)",
             ],
@@ -2407,7 +2407,7 @@ def _render_backtest():
 
         st.markdown(
             "**Stratégie hybride (depuis 2024) :**\n\n"
-            "- **Top 5 titres BRVM30** (SNTS, ORAC, SGBC, ECOC, SIBC) : tenus à leur poids BRVM30 exact "
+            "- **Top 5 titres BRVMCI** (SNTS, ORAC, SGBC, ECOC, SIBC) : tenus à leur poids BRVMCI exact "
             "via OTC (gré-à-gré). Aucune contrainte ADV — construction progressive en blocs OTC.\n"
             "- **25 titres restants** : sélection ADV-cap + redistribution classique. "
             "Exclus si ADV < 0,5 MFCFA/j ou poids résiduel < 0,1 %.\n\n"
@@ -2438,7 +2438,7 @@ def _render_backtest():
                 "# {...} = nombre de jours vérifiant la condition Vol = 0",
             ],
             note="Titre exclu si Stale ≥ 70 % (moins de 30 % des jours avec une transaction). "
-                 "Exception : les top 5 titres BRVM30 (par capitalisation) sont tenus via OTC quoi qu'il arrive — le stale ratio ne s'applique pas à eux.")
+                 "Exception : les top 5 titres BRVMCI (par capitalisation) sont tenus via OTC quoi qu'il arrive — le stale ratio ne s'applique pas à eux.")
 
         _lx("Plafond ADV — poids maximum exécutable en N jours (titres hors top 5 OTC)",
             r"\text{max\_w}_i = \min\!\left(\frac{20\% \times \text{ADV}_i \times N_i}{\text{AUM}},\ w_{\text{budget}}\right)",
@@ -2446,7 +2446,7 @@ def _render_backtest():
                 "max_w_i = poids maximum attribuable au titre i dans le panier ADV-capped",
                 "20 % = taux de participation maximum (screen + petits blocs OTC)",
                 "ADV_i = volume journalier moyen du titre i sur les 63 derniers jours (en M FCFA)",
-                "N_i = 40 jours si w_i^{BRVM30} ≥ 3 % (grand titre), sinon 20 jours (petit titre)",
+                "N_i = 40 jours si w_i^{BRVMCI} ≥ 3 % (grand titre), sinon 20 jours (petit titre)",
                 "AUM = actif sous gestion de référence (M FCFA)",
                 "w_budget = 1 − Σ(poids des top 5 OTC) = budget disponible pour les 25 restants",
             ],
@@ -2454,14 +2454,14 @@ def _render_backtest():
                  "Itération jusqu'à convergence (max 50 tours). Les top 5 titres ne sont PAS soumis à cette contrainte.")
 
         _lx("Poids minimum après redistribution (titres hors top 5 OTC)",
-            r"w_i^{\text{rest}} = \frac{w_i^{\text{BRVM30}}}{\displaystyle\sum_{k \in \text{restants}} w_k^{\text{BRVM30}}} \times w_{\text{budget}} \geq 0{,}1\%",
+            r"w_i^{\text{rest}} = \frac{w_i^{\text{BRVMCI}}}{\displaystyle\sum_{k \in \text{restants}} w_k^{\text{BRVMCI}}} \times w_{\text{budget}} \geq 0{,}1\%",
             legend=[
                 "w_i^rest = poids du titre i parmi les 25 titres ADV-capped (normalisé au budget restant)",
-                "w_i^BRVM30 = poids brut du titre i dans l'indice BRVMC officiel",
+                "w_i^BRVMCI = poids brut du titre i dans l'indice BRVMC officiel",
                 "w_budget = 1 − Σ(poids top 5 OTC) ≈ 40−50 % du panier",
             ],
             note="Si w_rest < 0,1 % → titre exclu et budget redistribué. "
-                 "Les top 5 OTC sont toujours à leur poids BRVM30 exact — jamais exclus.")
+                 "Les top 5 OTC sont toujours à leur poids BRVMCI exact — jamais exclus.")
 
         st.markdown("---")
         st.markdown("#### Bootstrap TE (N = 500 simulations)")
@@ -2711,7 +2711,7 @@ def _render_live():
                     _vl = _lp.get("vl_fcfa") or _lp.get("vl")
                     _bv = _lp.get("brvm30_official")
                     if _vl: _closes_etf[_d] = float(_vl)
-                    # Utiliser le BRVM30 du même snapshot que le VL (pas le lendemain matin)
+                    # Utiliser le BRVMCI du même snapshot que le VL (pas le lendemain matin)
                     if _bv:
                         _closes_idx[_d] = float(_bv)
                     elif _d in _brvm30_hist_te:
@@ -2861,12 +2861,12 @@ def _render_live():
             st.markdown(f"""
             <div class="kpi-card">
               <div class="kpi-card-hd">Portefeuille — {ts_label}
-                <span style="font-weight:400;color:#7d8fa3;font-size:0.6rem;margin-left:8px">ETF DISTR vs BRVM30 Price Return</span>
+                <span style="font-weight:400;color:#7d8fa3;font-size:0.6rem;margin-left:8px">ETF DISTR vs BRVMCI Price Return</span>
               </div>
               <div style="display:flex;flex-wrap:wrap">
                 {_kc("Variation jour", f"{chg_jour:+.3f}%" if chg_jour is not None else "—", color=_vc)}
                 {_kc("Parts émises", f"{_n_parts:,}" if _n_parts else "—")}
-                {_kc("BRVM30 PR (même pér.)", f"{_perf_idx:+.2f}%" if _perf_idx is not None else "—", color=_ic)}
+                {_kc("BRVMCI PR (même pér.)", f"{_perf_idx:+.2f}%" if _perf_idx is not None else "—", color=_ic)}
                 {_kc("Tracking Diff.", _td_str, color=_dc)}
               </div>
             </div>""", unsafe_allow_html=True)
@@ -2948,7 +2948,7 @@ def _render_live():
                 # Charger historique de l'indice BRVMC officiel
                 _brvm30_hist_path = os.path.join(BRVM30_DIR, "brvm30_index_history.json")
                 _brvm30_hist = load_json(_brvm30_hist_path) or {}
-                # Valeur de référence = clôture officielle BRVM30 le jour du lancement
+                # Valeur de référence = clôture officielle BRVMCI le jour du lancement
                 # Priorité à brvm30_index_history.json (clôture officielle) pour cohérence avec le KPI TD
                 _brvm30_at_launch = None
                 if _brvm30_hist and launch_date:
@@ -3087,22 +3087,22 @@ def _render_live():
                     if not idx_s.empty:
                         fig_cmp.add_trace(go.Scatter(
                             x=idx_s.index, y=idx_s.values,
-                            name="BRVM30",
+                            name="BRVMCI",
                             mode="lines+markers",
                             line=dict(color=BENCH_COLOR, width=2, dash="dash"),
                             marker=dict(size=6, color=BENCH_COLOR),
-                            hovertemplate="%{x|%d/%m}<br><b>BRVM30 : %{y:.2f}</b><extra></extra>",
+                            hovertemplate="%{x|%d/%m}<br><b>BRVMCI : %{y:.2f}</b><extra></extra>",
                         ))
                     fig_cmp.add_hline(y=100, line_dash="dot", line_color="#ccc5b9",
                                       annotation_text="Base 100 au lancement")
                     fig_cmp.update_layout(**PLOTLY_LAYOUT, height=380,
-                        title=f"ETF vs BRVM30 — base 100 depuis le {launch_date}",
+                        title=f"ETF vs BRVMCI — base 100 depuis le {launch_date}",
                         yaxis_title="Base 100", hovermode="x unified",
                         legend=dict(orientation="h", y=-0.14))
                     fig_cmp.update_xaxes(tickformat="%d/%m")
 
-                # ── Graphique ETF vs BRVM30 pleine largeur ────────────────────
-                _section("ETF vs BRVM30 — base 100")
+                # ── Graphique ETF vs BRVMCI pleine largeur ────────────────────
+                _section("ETF vs BRVMCI — base 100")
                 if fig_cmp is not None:
                     st.plotly_chart(fig_cmp, width='stretch')
                     st.caption("Base 100 = prix d'émission le jour du lancement.")
@@ -3147,7 +3147,7 @@ def _render_live():
                         _dt2 = pd.Timestamp(intra_date).normalize()
                         if _dt2 > _t0:
                             _v2 = _ls2.get("vl_live_fcfa") or (_ls2.get("nav_indice", 0) / nav_anch * par)
-                            _n2 = _ls2.get("brvm30_official")   # indice officiel BRVM30, pas nav_indice
+                            _n2 = _ls2.get("brvm30_official")   # indice officiel BRVMCI, pas nav_indice
                             if _v2: _raw_vl[_dt2] = float(_v2)
                             if _n2: _raw_ni[_dt2] = float(_n2)
 
@@ -3164,18 +3164,18 @@ def _render_live():
                         _tbl_rows.append({
                             "Date":            _dt.strftime("%d/%m/%Y"),
                             "VL ETF (FCFA)":        f"{_vl_r:,.0f}" if _vl_r else "—",
-                            "Indice BRVM30 (pts)":  f"{_ni_r:.2f}"  if _ni_r  else "—",
+                            "Indice BRVMCI (pts)":  f"{_ni_r:.2f}"  if _ni_r  else "—",
                             "ETF base 100":    f"{_b100_etf:.2f}" if _b100_etf is not None else "—",
-                            "BRVM30 base 100": f"{_b100_idx:.2f}" if _b100_idx is not None else "—",
+                            "BRVMCI base 100": f"{_b100_idx:.2f}" if _b100_idx is not None else "—",
                         })
                     if _tbl_rows:
-                        with st.expander("Données brutes — VL ETF & Indice BRVM30", expanded=False):
+                        with st.expander("Données brutes — VL ETF & Indice BRVMCI", expanded=False):
                             st.dataframe(
                                 pd.DataFrame(_tbl_rows).set_index("Date"),
                                 width='stretch',
                             )
 
-                # ── Écart de suivi cumulé (ETF − BRVM30 base 100) ────────────
+                # ── Écart de suivi cumulé (ETF − BRVMCI base 100) ────────────
                 if not etf_s.empty and not idx_s.empty:
                     _com_gap = etf_s.index.intersection(idx_s.index)
                     if len(_com_gap) >= 2:
@@ -3183,7 +3183,7 @@ def _render_live():
                         _gap_last  = float(_gap_s.iloc[-1])
                         _gap_color = POS_COLOR if _gap_last >= 0 else NEG_COLOR
                         _fill_color = "rgba(45,122,79,0.10)" if _gap_last >= 0 else "rgba(192,57,43,0.10)"
-                        _section("Écart de suivi ETF / BRVM30")
+                        _section("Écart de suivi ETF / BRVMCI")
                         fig_gap = go.Figure()
                         fig_gap.add_trace(go.Scatter(
                             x=_gap_s.index, y=[0.0] * len(_gap_s),
@@ -3191,7 +3191,7 @@ def _render_live():
                         ))
                         fig_gap.add_trace(go.Scatter(
                             x=_gap_s.index, y=_gap_s.values,
-                            name="ETF − BRVM30 (pts base 100)",
+                            name="ETF − BRVMCI (pts base 100)",
                             mode="lines",
                             line=dict(color=_gap_color, width=2.5),
                             fill="tonexty", fillcolor=_fill_color,
@@ -3200,7 +3200,7 @@ def _render_live():
                         fig_gap.add_hline(y=0, line_dash="dot", line_color="#cbd5e1",
                                           annotation_text="À égalité", annotation_position="right")
                         fig_gap.update_layout(**PLOTLY_LAYOUT, height=280,
-                            title="ETF vs BRVM30 — avance/retard depuis le lancement (base 100)",
+                            title="ETF vs BRVMCI — avance/retard depuis le lancement (base 100)",
                             yaxis_title="Points d'écart",
                             hovermode="x unified", showlegend=False)
                         fig_gap.update_xaxes(tickformat="%d/%m")
@@ -3208,7 +3208,7 @@ def _render_live():
                         _te_str2 = f"TE annualisée : {_te:.2f}%" if _te else ""
                         st.caption(
                             f"Écart actuel : {_gap_last:+.2f} pts — "
-                            + ("ETF en avance sur le BRVM30" if _gap_last >= 0 else "ETF en retard sur le BRVM30")
+                            + ("ETF en avance sur le BRVMCI" if _gap_last >= 0 else "ETF en retard sur le BRVMCI")
                             + (f"  ·  {_te_str2}" if _te_str2 else "")
                         )
 
@@ -3272,16 +3272,16 @@ def _render_live():
                             hovertemplate="%{x}<br><b>%{y:.2f} pts</b><extra></extra>",
                         ))
                         fig_idx.update_layout(**PLOTLY_LAYOUT, height=320,
-                            title="BRVM30 intraday (pts)",
+                            title="BRVMCI intraday (pts)",
                             xaxis_title="Heure (UTC)", yaxis_title="Points",
                             yaxis_range=[_idx_min - _idx_pad, _idx_max + _idx_pad],
                             showlegend=False, hovermode="x unified")
                         st.plotly_chart(fig_idx, width='stretch')
                     else:
-                        st.info("Pas encore de données BRVM30 aujourd'hui.")
+                        st.info("Pas encore de données BRVMCI aujourd'hui.")
                 # Ligne 2 : comparaison base 100 pleine largeur
                 if True:
-                    # BRVM30 intraday rebalisé à 100 — base commune = premier point où ETF ET BRVM30 ont une valeur
+                    # BRVMCI intraday rebalisé à 100 — base commune = premier point où ETF ET BRVMCI ont une valeur
                     _par_intra = float((launch or {}).get("par_fcfa", 100000))
                     idx_pts = [s.get("brvm30_official") for s in _intra_snaps]
                     # Trouver le premier index où les deux séries ont une valeur
@@ -3304,24 +3304,24 @@ def _render_live():
                             hovertemplate="%{x}<br><b>ETF : %{y:.3f}</b><extra></extra>",
                         ))
                         fig_cmp_intra.add_trace(go.Scatter(
-                            x=times_c, y=idx_base100, name="BRVM30",
+                            x=times_c, y=idx_base100, name="BRVMCI",
                             mode="lines+markers", line=dict(color=BENCH_COLOR, width=2, dash="dash"),
                             marker=dict(size=5),
-                            hovertemplate="%{x}<br><b>BRVM30 : %{y:.3f}</b><extra></extra>",
+                            hovertemplate="%{x}<br><b>BRVMCI : %{y:.3f}</b><extra></extra>",
                         ))
                         star_pts   = [s.get("brvm30_star") for s in _snaps_c]
                         _star_open = next((v for v in star_pts if v is not None), None)
                         if _star_open:
                             star_base100 = [round(v / _star_open * 100, 4) if v is not None else None for v in star_pts]
                             fig_cmp_intra.add_trace(go.Scatter(
-                                x=times_c, y=star_base100, name="BRVM30*",
+                                x=times_c, y=star_base100, name="BRVMCI*",
                                 mode="lines+markers", line=dict(color="#7c3aed", width=2, dash="dot"),
                                 marker=dict(size=5),
-                                hovertemplate="%{x}<br><b>BRVM30* : %{y:.3f}</b><extra></extra>",
+                                hovertemplate="%{x}<br><b>BRVMCI* : %{y:.3f}</b><extra></extra>",
                             ))
                         fig_cmp_intra.add_hline(y=100, line_dash="dot", line_color="#cbd5e1")
                         fig_cmp_intra.update_layout(**PLOTLY_LAYOUT, height=300,
-                            title=f"ETF vs BRVM30 — base 100 à {times_c[0]}",
+                            title=f"ETF vs BRVMCI — base 100 à {times_c[0]}",
                             xaxis_title="Heure (UTC)", yaxis_title="Base 100",
                             legend=dict(orientation="h", y=-0.2),
                             hovermode="x unified")
@@ -3342,7 +3342,7 @@ def _render_live():
 
                         def _sig_tickers(contribs, w_idx_map):
                             """Titres significatifs : ont bougé ET ont un impact sur l'ETF OU sur l'écart.
-                            Inclut les titres hors ETF (w_pct=0) s'ils ont un poids BRVM30 significatif."""
+                            Inclut les titres hors ETF (w_pct=0) s'ils ont un poids BRVMCI significatif."""
                             result = []
                             for tk, v in contribs.items():
                                 r = v.get('ret_pct', 0)
@@ -3416,7 +3416,7 @@ def _render_live():
                                         f'<div style="font-size:11px;padding:4px 8px;margin-bottom:6px;'
                                         f'background:#f9fafb;border-left:3px solid #cbd5e1;border-radius:0 4px 4px 0;color:#6b7280">'
                                         f'Ecart negligeable ({gap_actual:+.3f}%). '
-                                        f'Poids ETF vs BRVM30 pour les titres qui ont bouge :'
+                                        f'Poids ETF vs BRVMCI pour les titres qui ont bouge :'
                                         f'</div>'
                                     )
                                 else:
@@ -3424,7 +3424,7 @@ def _render_live():
                                         f'<div style="font-size:11px;padding:4px 8px;margin-bottom:6px;'
                                         f'background:#fef9f0;border-left:3px solid #f59e0b;border-radius:0 4px 4px 0;color:#92400e">'
                                         f'Attribution partielle ({total_expl:+.4f}pts sur {gap_actual:+.3f}%). '
-                                        f'Poids ETF vs BRVM30 pour les titres qui ont bouge :'
+                                        f'Poids ETF vs BRVMCI pour les titres qui ont bouge :'
                                         f'</div>'
                                     )
                                 _th = (
@@ -3432,7 +3432,7 @@ def _render_live():
                                     f'gap:4px;padding:4px 8px;background:#f3f4f6;border-radius:4px;margin-bottom:4px;'
                                     f'font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase">'
                                     f'<span>Titre</span><span>Var%</span>'
-                                    f'<span>ETF%</span><span>BRVM30%</span>'
+                                    f'<span>ETF%</span><span>BRVMCI%</span>'
                                     f'<span>Δ poids</span><span>Gap contrib</span>'
                                     f'</div>'
                                 )
@@ -3502,13 +3502,13 @@ def _render_live():
                             _etf_d = round(etf_base100[_ai] - etf_base100[_ai-1], 3)
                             # BRVMC officiel Sika (peut rester figé 15-30 min entre MAJ)
                             _idx_d_off = round((idx_base100[_ai] or 0) - (idx_base100[_ai-1] or 0), 3) if idx_base100[_ai] and idx_base100[_ai-1] else None
-                            # BRVM30* estimé depuis nos propres prix (synchrone avec l'iNAV)
+                            # BRVMCI* estimé depuis nos propres prix (synchrone avec l'iNAV)
                             _tc_ai = _sp.get('ticker_contributions', {})
                             _idx_d_est = None
                             if _tc_ai:
                                 _brv_est = sum(v.get('w_brvm30_pct', 0) / 100 * v.get('ret_pct', 0) for v in _tc_ai.values())
                                 _idx_d_est = round(_brv_est * (idx_base100[_ai - 1] or 100) / 100, 3)
-                            # Attribution : BRVM30* en principal (synchrone), officiel en note
+                            # Attribution : BRVMCI* en principal (synchrone), officiel en note
                             _idx_d = _idx_d_est if _idx_d_est is not None else _idx_d_off
                             _gap   = round(_etf_d - _idx_d, 3) if _idx_d is not None else None
                             _attr_data.append({
@@ -3522,8 +3522,8 @@ def _render_live():
                           with st.expander("Attribution intraday — explication des mouvements", expanded=False):
                             st.caption(
                                 "Cliquez sur une tranche pour voir le detail. "
-                                "Ce qui a bouge l'ETF + pourquoi il ne suit pas exactement l'indice BRVM30. "
-                                "BRVM30* = estimation synchrone calculee depuis nos prix (latence Sika ~15-30 min)."
+                                "Ce qui a bouge l'ETF + pourquoi il ne suit pas exactement l'indice BRVMCI. "
+                                "BRVMCI* = estimation synchrone calculee depuis nos prix (latence Sika ~15-30 min)."
                             )
                             _items_html = ""
                             for _i, _d in enumerate(_attr_data):
@@ -3552,7 +3552,7 @@ def _render_live():
                                     f'<span style="color:#6b7280;font-size:11px;min-width:90px">{"" if _has_detail else ""}{_d["periode"]}</span>'
                                     f'<span style="color:#9ca3af;font-size:11px">ETF</span>'
                                     f'<span style="color:{_ec};font-weight:600;min-width:55px">{_ed:+.3f}%</span>'
-                                    f'<span style="color:#9ca3af;font-size:11px">BRVM30*</span>'
+                                    f'<span style="color:#9ca3af;font-size:11px">BRVMCI*</span>'
                                     f'<span style="color:{_ic};min-width:80px">{f"{_id:+.3f}%" if _id is not None else "—"}{_off_note}</span>'
                                     f'<span style="color:#9ca3af;font-size:11px">Écart</span>'
                                     f'<span style="color:{_gc};font-weight:700;min-width:55px">{f"{_gp:+.3f}%" if _gp is not None else "—"}</span>'
@@ -3646,7 +3646,7 @@ def _render_live():
                             f'<span style="font-weight:600;color:#374151;min-width:100px">{_day_label}</span>'
                             f'<span style="color:#9ca3af;font-size:11px">ETF journée</span>'
                             f'<span style="color:{_etf_col};font-weight:600;min-width:55px">{f"{_etf_j:+.3f}%" if _etf_j is not None else "—"}</span>'
-                            f'<span style="color:#9ca3af;font-size:11px">BRVM30</span>'
+                            f'<span style="color:#9ca3af;font-size:11px">BRVMCI</span>'
                             f'<span style="color:{_brv_col};min-width:55px">{f"{_brv_j:+.3f}%" if _brv_j is not None else "—"}</span>'
                             f'<span style="color:#9ca3af;font-size:11px">Écart</span>'
                             f'<span style="color:{_ec_col};font-weight:700;min-width:55px">{f"{_eca_j:+.3f}%" if _eca_j is not None else "—"}</span>'
@@ -3674,7 +3674,7 @@ def _render_live():
                                 f'<span style="color:#6b7280;min-width:80px">{_t0h}→{_t1h}</span>'
                                 f'<span style="color:#9ca3af;font-size:11px">ETF</span>'
                                 f'<span style="color:{_ec2};font-weight:600;min-width:55px">{f"{_ed:+.3f}%" if _ed is not None else "—"}</span>'
-                                f'<span style="color:#9ca3af;font-size:11px">BRVM30</span>'
+                                f'<span style="color:#9ca3af;font-size:11px">BRVMCI</span>'
                                 f'<span style="color:{_ic2};min-width:55px">{f"{_id:+.3f}%" if _id is not None else "—"}</span>'
                                 f'<span style="color:#9ca3af;font-size:11px">Écart</span>'
                                 f'<span style="color:{_gc2};font-weight:700;min-width:55px">{f"{_gp:+.3f}%" if _gp is not None else "—"}</span>'
@@ -3693,7 +3693,7 @@ def _render_live():
                                 f'<b style="color:#374151">Résumé de la journée</b>'
                                 f'<span style="margin-left:16px;color:#6b7280">ETF total : </span>'
                                 f'<b style="color:{_etf_col}">{f"{_etf_j:+.3f}%" if _etf_j else "—"}</b>'
-                                f'<span style="margin-left:12px;color:#6b7280">BRVM30 total : </span>'
+                                f'<span style="margin-left:12px;color:#6b7280">BRVMCI total : </span>'
                                 f'<b style="color:{_brv_col}">{f"{_brv_j:+.3f}%" if _brv_j else "—"}</b>'
                                 f'<span style="margin-left:12px;color:#6b7280">Écart total : </span>'
                                 f'<b style="color:{_ec_col}">{f"{_eca_j:+.3f}%" if _eca_j is not None else "—"}</b>'
@@ -3823,7 +3823,7 @@ def _render_live():
                 if not sika_data:
                     st.info("ℹ Sika Finance indisponible — variations journalières non affichées.")
 
-                # Poids flottants courants de l'indice BRVM30 (recalculés avec prix du jour)
+                # Poids flottants courants de l'indice BRVMCI (recalculés avec prix du jour)
                 # Formule : w_i(t) = w_i(rebal) × (P_i(t)/P_i(rebal)) / Σ(w_j(rebal) × P_j(t)/P_j(rebal))
                 _rebal_date_live = _last_rb_live.get("date", "")
                 _sh_live = load_json(os.path.join(BRVM30_DIR, "sika_history.json")) or {}
@@ -3855,7 +3855,7 @@ def _render_live():
                         "Ticker":          r["ticker"],
                         "Poids live (%)":  w_live,
                         "Cible rebal (%)": w_cible,
-                        "Indice BRVM30 (%)": w_b30,
+                        "Indice BRVMCI (%)": w_b30,
                         "_capped":         _capped_live.get(r["ticker"], False),
                         "Clôture":         f"{int(last):,}" if last else "—",
                         "Var. J (%)":      var_j,
@@ -3878,7 +3878,7 @@ def _render_live():
                 def _color_drift_live(row):
                     styles = [""] * len(row)
                     cols = list(row.index)
-                    b30   = row.get("Indice BRVM30 (%)")
+                    b30   = row.get("Indice BRVMCI (%)")
                     # Titre capé : lu directement depuis le basket rebal_detail
                     capped = bool(row.get("_capped", False))
                     if capped:
@@ -3889,7 +3889,7 @@ def _render_live():
                         if "Cible rebal (%)" in cols:
                             styles[cols.index("Cible rebal (%)")] = "background-color: #FDEDEC; color: #C0392B; font-weight:600"
                     # Dérive live vs poids flottant courant de l'indice > 1%
-                    if "Poids live (%)" in cols and "Indice BRVM30 (%)" in cols:
+                    if "Poids live (%)" in cols and "Indice BRVMCI (%)" in cols:
                         live = row["Poids live (%)"]
                         if live is not None and b30 is not None and not pd.isna(live) and not pd.isna(b30):
                             if abs(live - b30) > 1.0:
@@ -3907,7 +3907,7 @@ def _render_live():
                         "Var. J (%)":        _fmt_var,
                         "Poids live (%)":    "{:.4f}%",
                         "Cible rebal (%)":   lambda x: f"{x:.4f}%" if x is not None and not (isinstance(x, float) and pd.isna(x)) else "—",
-                        "Indice BRVM30 (%)": lambda x: f"{x:.4f}%" if x is not None and not (isinstance(x, float) and pd.isna(x)) else "—",
+                        "Indice BRVMCI (%)": lambda x: f"{x:.4f}%" if x is not None and not (isinstance(x, float) and pd.isna(x)) else "—",
                         "Val. (M FCFA)":     "{:.1f}",
                     })
 
@@ -3983,7 +3983,7 @@ def _render_live():
         # Panier ETF actuel (sous-ensemble des 30) — utilisé dans la correction historique
         _etf_basket = {b["ticker"].upper(): b["poids_pct"] for b in _nl_rb.get("basket", [])}
 
-        # Build official BRVM30 composition dict indexed by date (from PDF scrapes only)
+        # Build official BRVMCI composition dict indexed by date (from PDF scrapes only)
         comp_pdf = [c for c in comp_hist_raw if c.get("rebal_date") and len(c.get("composition", [])) >= 25]
         comp_pdf = sorted(comp_pdf, key=lambda x: x["rebal_date"])
         # Fallback: compute entries/exits from consecutive compositions ONLY when both are complete (n==30)
@@ -4283,7 +4283,7 @@ def _render_live():
                 curr_index = curr_basket | {e["ticker"] for e in rebal.get("excluded", [])}
                 prev_index = prev_basket | {e["ticker"] for e in (prev.get("excluded", []) if prev else [])}
 
-                # Official BRVM30 change from PDF only — no fallback reconstruction
+                # Official BRVMCI change from PDF only — no fallback reconstruction
                 official = _find_official(rebal["date"])
                 if official:
                     idx_entries  = official.get("entries", [])
@@ -4356,7 +4356,7 @@ def _render_live():
 
                         if _wchk:
                             if _wchk_ok:
-                                st.success(f"Poids OK — somme BRVM30 = {_wchk_sum:.1%}")
+                                st.success(f"Poids OK — somme BRVMCI = {_wchk_sum:.1%}")
                             else:
                                 _warn_msg = f"Somme poids = {_wchk_sum:.1%}"
                                 if _wchk_zero:
@@ -4374,11 +4374,11 @@ def _render_live():
                                 '<span style="font-weight:400;color:#f59e0b;text-transform:none;letter-spacing:0"> — PDF non disponible</span>'
                             )
                             st.markdown(
-                                f'<p class="cgf-section">Indice BRVM30{src_label}</p>',
+                                f'<p class="cgf-section">Indice BRVMCI{src_label}</p>',
                                 unsafe_allow_html=True,
                             )
                             if not idx_source:
-                                st.caption("Données officielles BRVM30 non disponibles pour cette date. "
+                                st.caption("Données officielles BRVMCI non disponibles pour cette date. "
                                            "Utilise le panneau d'édition manuelle ci-dessus pour saisir la composition.")
                             else:
                                 # Avertissement OCR partiel
@@ -4521,13 +4521,13 @@ def _render_live():
                                 st.dataframe(
                                     df_b.rename(columns={
                                         "ticker": "Ticker", "w_etf": "Poids %",
-                                        "w_brvm30": "BRVM30 %", "delta": "Delta %",
+                                        "w_brvm30": "BRVMCI %", "delta": "Delta %",
                                         "trade_mfcfa": "Trade (MFCFA)", "days_exec": "J.",
                                         "force": "OTC", "mvt": "Mvt",
                                     }).style.map(_color_cell, subset=["Trade (MFCFA)"]),
                                     width='stretch', hide_index=True,
                                     height=min(400, 44 + len(df_b) * 36),
-                                    column_order=["Ticker", "OTC", "Poids %", "BRVM30 %",
+                                    column_order=["Ticker", "OTC", "Poids %", "BRVMCI %",
                                                   "Trade (MFCFA)", "J.", "Mvt"],
                                 )
                                 total_buy  = df_b["trade_mfcfa"].clip(lower=0).sum()
@@ -4547,7 +4547,7 @@ def _render_live():
                                     st.download_button(
                                         "Telecharger PDF",
                                         data=_pf.read(),
-                                        file_name=f"BRVM30_rebal_{rebal['date']}.pdf",
+                                        file_name=f"BRVMCI_rebal_{rebal['date']}.pdf",
                                         mime="application/pdf",
                                         key=f"dl_pdf_{rebal['date']}",
                                     )
@@ -5082,7 +5082,7 @@ def _render_live():
                     title="Poids par pays (%)", xaxis_title="%", showlegend=False)
                 st.plotly_chart(fig_pays_bar, width='stretch')
 
-        # ── 2. Poids ETF vs BRVM30 (live + hier) ─────────────────────────────
+        # ── 2. Poids ETF vs BRVMCI (live + hier) ─────────────────────────────
         intra_data  = load_json_fresh(os.path.join(BRVM30_DIR, "intraday_nav.json")) or {}
         intra_hist  = load_json(os.path.join(BRVM30_DIR, "nav_intraday_history.json")) or {}
         snaps_today = intra_data.get("snapshots", [])
@@ -5095,7 +5095,7 @@ def _render_live():
             tc = last_snap.get("ticker_contributions", {})
             tc_live = tc if isinstance(tc, dict) else {}
 
-        # Poids BRVM30 d'hier (dernier snapshot de la veille)
+        # Poids BRVMCI d'hier (dernier snapshot de la veille)
         tc_hier = {}
         date_today = intra_data.get("date", "")
         if isinstance(intra_hist, dict) and intra_hist:
@@ -5108,7 +5108,7 @@ def _render_live():
 
         if basket_now and last_rb.get("basket"):
             st.markdown("---")
-            _section(f"Poids ETF vs BRVM30 — {snap_time} UTC (live) | rebalancement {last_rb.get('date_label','—')}")
+            _section(f"Poids ETF vs BRVMCI — {snap_time} UTC (live) | rebalancement {last_rb.get('date_label','—')}")
 
             w_brvm_rebal      = {b["ticker"]: b.get("w_brvm30", 0) * 100 for b in last_rb["basket"]}
             w_etf_cible       = {b["ticker"]: b.get("w_etf",   0) * 100 for b in last_rb["basket"]}
@@ -5130,11 +5130,11 @@ def _render_live():
                     "Dans ETF":         "oui",
                     "ETF % (live)":     round(w_etf, 2),
                     "Cible rebal %":    round(w_cible, 2) if w_cible is not None else None,
-                    "BRVM30 live %":    round(w_live, 2) if w_live is not None else None,
-                    "BRVM30 rebal %":   round(w_rebal, 2) if w_rebal is not None else None,
+                    "BRVMCI live %":    round(w_live, 2) if w_live is not None else None,
+                    "BRVMCI rebal %":   round(w_rebal, 2) if w_rebal is not None else None,
                     "Écart (ETF-live)": delta,
                 })
-            # Titres exclus de l'ETF (poids BRVM30 > 0, poids ETF = 0)
+            # Titres exclus de l'ETF (poids BRVMCI > 0, poids ETF = 0)
             for excl in sorted(excluded, key=lambda x: x.get("w_brvm30", 0), reverse=True):
                 tk      = excl["ticker"]
                 w_live  = tc_live.get(tk, {}).get("w_brvm30_pct") if tc_live else None
@@ -5147,8 +5147,8 @@ def _render_live():
                     "Dans ETF":         "exclu",
                     "ETF % (live)":     0.0,
                     "Cible rebal %":    0.0,
-                    "BRVM30 live %":    round(w_live, 2) if w_live is not None else None,
-                    "BRVM30 rebal %":   round(w_rebal, 2) if w_rebal else None,
+                    "BRVMCI live %":    round(w_live, 2) if w_live is not None else None,
+                    "BRVMCI rebal %":   round(w_rebal, 2) if w_rebal else None,
                     "Écart (ETF-live)": delta,
                 })
 
@@ -5164,8 +5164,8 @@ def _render_live():
                 styles = [""] * len(row)
                 cols = list(row.index)
                 cible  = row.get("Cible rebal %")
-                b30_rb = row.get("BRVM30 rebal %")
-                # Titre capé par ADV : cible rebal < poids BRVM30 rebal - seuil
+                b30_rb = row.get("BRVMCI rebal %")
+                # Titre capé par ADV : cible rebal < poids BRVMCI rebal - seuil
                 capped = (cible is not None and b30_rb is not None
                           and not pd.isna(cible) and not pd.isna(b30_rb)
                           and b30_rb > 0 and cible < b30_rb - 0.05
@@ -5194,8 +5194,8 @@ def _render_live():
                     .format({
                         "ETF % (live)":     fmt_pct,
                         "Cible rebal %":    fmt_pct,
-                        "BRVM30 live %":    fmt_pct,
-                        "BRVM30 rebal %":   fmt_pct,
+                        "BRVMCI live %":    fmt_pct,
+                        "BRVMCI rebal %":   fmt_pct,
                         "Écart (ETF-live)": lambda x: f"{x:+.2f}%" if x is not None and not (isinstance(x, float) and pd.isna(x)) else "—",
                     })
                     .apply(_color_drift, axis=1)
@@ -5641,7 +5641,7 @@ def _render_live():
 
             col_lv1, col_lv2 = st.columns(2)
 
-            # ── Graphique 2 : Drawdown ETF vs BRVM30 ──────────────────────────
+            # ── Graphique 2 : Drawdown ETF vs BRVMCI ──────────────────────────
             with col_lv1:
                 fig_lv_dd = go.Figure()
                 fig_lv_dd.add_trace(go.Scatter(
@@ -5650,11 +5650,11 @@ def _render_live():
                     line=dict(color=COLOR, width=1.5),
                     hovertemplate="%{x|%d/%m/%Y}<br>DD ETF : <b>%{y:.2f}%</b><extra></extra>"))
                 fig_lv_dd.add_trace(go.Scatter(
-                    x=_df_m.index, y=_idx_dd, name="BRVM30",
+                    x=_df_m.index, y=_idx_dd, name="BRVMCI",
                     line=dict(color=BENCH_COLOR, width=1.5, dash="dot"),
-                    hovertemplate="%{x|%d/%m/%Y}<br>DD BRVM30 : <b>%{y:.2f}%</b><extra></extra>"))
+                    hovertemplate="%{x|%d/%m/%Y}<br>DD BRVMCI : <b>%{y:.2f}%</b><extra></extra>"))
                 fig_lv_dd.update_layout(**PLOTLY_LAYOUT, height=300,
-                    title="Drawdown — ETF vs BRVM30",
+                    title="Drawdown — ETF vs BRVMCI",
                     yaxis_title="%", legend=dict(orientation="h", y=-0.2))
                 st.plotly_chart(fig_lv_dd, width='stretch')
 
@@ -5669,7 +5669,7 @@ def _render_live():
                     hovertemplate="%{x|%d/%m/%Y}<br>TD : <b>%{y:+.3f} pts</b><extra></extra>"))
                 fig_lv_td.add_hline(y=0, line_dash="dash", line_color="#e0dbd2")
                 fig_lv_td.update_layout(**PLOTLY_LAYOUT, height=300,
-                    title="Tracking Difference cumulée (ETF − BRVM30 Price Return, base 100)",
+                    title="Tracking Difference cumulée (ETF − BRVMCI Price Return, base 100)",
                     yaxis_title="pts")
                 fig_lv_td.add_annotation(
                     text="TD+ attendue en mars–sept. : l'ETF capture les dividendes, l'indice PR ne les intègre pas",
@@ -5693,16 +5693,16 @@ def _render_live():
                         marker_color=[POS_COLOR if v >= 0 else NEG_COLOR for v in _etf_rets],
                         hovertemplate="%{x|%d/%m/%Y}<br>ETF : <b>%{y:+.3f}%</b><extra></extra>"))
                     fig_lv_r.add_trace(go.Scatter(
-                        x=_idx_rets.index, y=_idx_rets, name="BRVM30",
+                        x=_idx_rets.index, y=_idx_rets, name="BRVMCI",
                         mode="markers", marker=dict(color=BENCH_COLOR, size=7, symbol="diamond"),
-                        hovertemplate="%{x|%d/%m/%Y}<br>BRVM30 : <b>%{y:+.3f}%</b><extra></extra>"))
+                        hovertemplate="%{x|%d/%m/%Y}<br>BRVMCI : <b>%{y:+.3f}%</b><extra></extra>"))
                     fig_lv_r.add_hline(y=0, line_color="#e0dbd2")
                     fig_lv_r.update_layout(**PLOTLY_LAYOUT, height=300,
                         title="Rendements journaliers",
                         yaxis_title="%", legend=dict(orientation="h", y=-0.2))
                     st.plotly_chart(fig_lv_r, width='stretch')
 
-                # ── Graphique 5 : Rendement actif (ETF − BRVM30) ──────────────
+                # ── Graphique 5 : Rendement actif (ETF − BRVMCI) ──────────────
                 with col_lv4:
                     fig_lv_act = go.Figure(go.Bar(
                         x=_active.index, y=_active,
@@ -5710,7 +5710,7 @@ def _render_live():
                         hovertemplate="%{x|%d/%m/%Y}<br>Actif : <b>%{y:+.3f}%</b><extra></extra>"))
                     fig_lv_act.add_hline(y=0, line_color="#e0dbd2")
                     fig_lv_act.update_layout(**PLOTLY_LAYOUT, height=300,
-                        title="Rendement actif journalier (ETF − BRVM30)",
+                        title="Rendement actif journalier (ETF − BRVMCI)",
                         yaxis_title="%")
                     st.plotly_chart(fig_lv_act, width='stretch')
 
@@ -6086,7 +6086,7 @@ def _render_live():
         _today_tr     = pd.Timestamp.now().strftime("%Y-%m-%d")
         _launch_tr    = (load_json(os.path.join(BRVM30_DIR, "launch_state.json")) or {}).get("launch_date", "")
 
-        # Construire index basket ETF et BRVM30
+        # Construire index basket ETF et BRVMCI
         _bask_tr  = {b["ticker"]: b for b in basket_now}
         _b30_tr   = {b["ticker"]: b.get("w_brvm30", 0) for b in last_rb.get("basket", [])}
 
@@ -6123,7 +6123,7 @@ def _render_live():
                     "Rend. Sika (%)":   round(_rend * 100, 2),
                     "Poids ETF (%)":    round(_w_etf * 100, 3),
                     "Contrib ETF (bp)": round(_contrib_etf * 100, 1),
-                    "Poids BRVM30 (%)": round(_w_b30 * 100, 3),
+                    "Poids BRVMCI (%)": round(_w_b30 * 100, 3),
                     "Contrib B30 (bp)": round(_contrib_b30 * 100, 1),
                 })
 
@@ -6141,12 +6141,12 @@ def _render_live():
         _td1, _td2, _td3, _td4, _td5 = st.columns(5)
         _td1.metric("Rend. Div. ETF (YTD)",   f"{_etf_div_yield:.2f}%",
                     help="Dividendes captés par l'ETF pondérés par les poids du panier")
-        _td2.metric("Rend. Div. BRVM30 (YTD)", f"{_b30_div_yield:.2f}%",
-                    help="Dividendes théoriques de l'indice pondérés par les poids BRVM30")
+        _td2.metric("Rend. Div. BRVMCI (YTD)", f"{_b30_div_yield:.2f}%",
+                    help="Dividendes théoriques de l'indice pondérés par les poids BRVMCI")
         _td3.metric("Total Return ETF",        f"{_tr_etf:+.2f}%",
                     help="Price Return ETF + Rendement Dividende ETF")
-        _td4.metric("Total Return BRVM30",     f"{_tr_b30:+.2f}%",
-                    help="Price Return BRVM30 + Rendement Dividende BRVM30")
+        _td4.metric("Total Return BRVMCI",     f"{_tr_b30:+.2f}%",
+                    help="Price Return BRVMCI + Rendement Dividende BRVMCI")
         _td5.metric("Écart Div. ETF vs B30",   f"{_ecart_div:+.2f}%",
                     delta=round(_ecart_div, 2),
                     help="Positif = ETF a capté plus de dividendes que l'indice (bonne capture)")
@@ -6161,11 +6161,11 @@ def _render_live():
             ))
             _fig_div.add_trace(go.Bar(
                 x=_df_div_tr["Ticker"], y=_df_div_tr["Contrib B30 (bp)"],
-                name="Contribution BRVM30 (bp)", marker_color=BENCH_COLOR,
-                hovertemplate="%{x}<br>BRVM30 : <b>%{y:.1f} bp</b><extra></extra>",
+                name="Contribution BRVMCI (bp)", marker_color=BENCH_COLOR,
+                hovertemplate="%{x}<br>BRVMCI : <b>%{y:.1f} bp</b><extra></extra>",
             ))
             _fig_div.update_layout(**PLOTLY_LAYOUT, height=300, barmode="group",
-                title="Contribution dividende par titre — ETF vs BRVM30 (points de base)",
+                title="Contribution dividende par titre — ETF vs BRVMCI (points de base)",
                 yaxis_title="bp", legend=dict(orientation="h", y=-0.2))
             st.plotly_chart(_fig_div, width='stretch')
 
@@ -6175,7 +6175,7 @@ def _render_live():
                                  "Rend. Sika (%)":   st.column_config.NumberColumn(format="%.2f"),
                                  "Poids ETF (%)":    st.column_config.NumberColumn(format="%.3f"),
                                  "Contrib ETF (bp)": st.column_config.NumberColumn(format="%.1f"),
-                                 "Poids BRVM30 (%)": st.column_config.NumberColumn(format="%.3f"),
+                                 "Poids BRVMCI (%)": st.column_config.NumberColumn(format="%.3f"),
                                  "Contrib B30 (bp)": st.column_config.NumberColumn(format="%.1f"),
                              })
         else:

@@ -39,11 +39,12 @@ EX_PATH = os.path.join(EXCEL_DIR, 'BRVM_Consolidated_Kendall_updated.xlsx')
 # ── Paramètres de sélection du panier ────────────────────────────────────────
 MAX_EXEC_SMALL      = 20      # Petits titres (<LARGE_THRESHOLD) : max 20j
 MAX_EXEC_LARGE      = 40      # Grands titres (>=LARGE_THRESHOLD) : max 40j
-LARGE_THRESHOLD     = 0.03    # Seuil "grand titre" : 3% du BRVM30
+LARGE_THRESHOLD     = 0.03    # Seuil "grand titre" : 3% du BRVMCI
 PARTICIPATION_RATE  = 0.15    # Max 15% de l'ADV quotidien (screen + OTC petits blocs)
 MIN_ADV_MFCFA       = 0.5    # ADV minimum pour être inclus (M FCFA/j)
+MIN_INDEX_WEIGHT    = 0.001   # Poids minimum dans l'indice pour être inclus (0.1%)
 MIN_BASKET_WEIGHT   = 0.001   # Poids minimum après redistribution (0.1%)
-FORCE_TOP_N         = 5       # Top N titres (par poids BRVM30) tenus à leur poids exact (OTC)
+FORCE_TOP_N         = 5       # Top N titres (par poids BRVMCI) tenus à leur poids exact (OTC)
 MGMT_FEE_ANN        = 0.006  # Frais de gestion : 0.60%/an
 AUM_MFCFA           = 5_000  # AUM de référence en M FCFA (5 Md)
 RF_RATE_ANN         = 0.03   # Taux sans risque annuel (UEMOA) pour placement dividendes
@@ -59,10 +60,11 @@ np.random.seed(42)
 # CHARGEMENT
 # ══════════════════════════════════════════════════════════════════════════════
 print("[1/6] Chargement des données…")
-dd = json.load(open(DD_PATH, encoding='utf-8'))
-sh = json.load(open(SH_PATH, encoding='utf-8'))
-bm = json.load(open(BM_PATH, encoding='utf-8'))
-rd = json.load(open(RD_PATH, encoding='utf-8'))
+dd  = json.load(open(DD_PATH, encoding='utf-8'))
+sh  = json.load(open(SH_PATH, encoding='utf-8'))
+bm  = json.load(open(BM_PATH, encoding='utf-8'))
+rd  = json.load(open(RD_PATH, encoding='utf-8'))
+soc = json.load(open(os.path.join(DATA, 'sika_societe.json'), encoding='utf-8'))
 
 # ── Dividendes historiques ────────────────────────────────────────────────────
 # dividend_history : {ticker: {year: montant_fcfa_par_action}}
@@ -91,8 +93,8 @@ print(f"   Dividendes : {sum(len(v) for v in _div_calendar.values())} versements
 w_history   = dd['w_history']
 rebal_dates = sorted(w_history.keys())
 
-# Poids BRVM30 par ticker à chaque rebalancement (depuis rebal_detail)
-brvm30_weights_hist = {}   # {rebal_date: {ticker: w_brvm30}}
+# Poids BRVMCI par ticker à chaque rebalancement (depuis rebal_detail)
+brvm30_weights_hist = {}   # {rebal_date: {ticker: w_brvmci}}
 for r in rd.get('rebalancings', []):
     dt = r.get('date', '')
     basket   = r.get('basket',   [])
@@ -106,8 +108,8 @@ for r in rd.get('rebalancings', []):
     if w_map:
         brvm30_weights_hist[dt] = w_map
 
-# ── BRVM30 PR depuis Sika (brvm30_index_history.json) ────────────────────────
-print("[2/6] Lecture BRVM30 PR depuis Sika…")
+# ── BRVMCI PR depuis Sika (brvm30_index_history.json) ────────────────────────
+print("[2/6] Lecture BRVMCI PR depuis Sika…")
 BRVM30_PATH = os.path.join(DATA, 'brvm30_index_history.json')
 _brvm30_raw = json.load(open(BRVM30_PATH, encoding='utf-8'))
 brvm30_raw = {k: float(v) for k, v in _brvm30_raw.items() if v}
@@ -142,7 +144,24 @@ def compute_adv(ticker, as_of_date, window_days=None):
     dates = [d for d in hist if q_start <= d <= q_end]
     vals  = [(hist[d].get('volume', 0) or 0) * (hist[d].get('close', 0) or 0) / 1e6
              for d in dates]
-    return float(sum(vals) / len(dates)) if dates else 0.0
+    if dates and any(v > 0 for v in vals):
+        return float(sum(vals) / len(dates))
+
+    # Fallback 1 : volumes récents Sika (jusqu'à 90 jours disponibles)
+    all_dates = sorted(hist.keys())
+    recent_vals = [(hist[d].get('volume', 0) or 0) * (hist[d].get('close', 0) or 0) / 1e6
+                   for d in all_dates[-90:] if (hist[d].get('volume', 0) or 0) > 0]
+    if recent_vals:
+        return float(np.mean(recent_vals))
+
+    # Fallback 2 : capitalisation × 0.1% turnover quotidien
+    if all_dates:
+        price = (hist[all_dates[-1]].get('close', 0) or 0)
+        nb    = soc.get(ticker, {}).get('nb_titres', 0)
+        if nb and price:
+            return nb * price / 1e6 * 0.001
+
+    return 1.0  # plancher conservatif > MIN_ADV_MFCFA
 
 
 def spread_one_way(adv_mfcfa):
@@ -165,7 +184,7 @@ def build_basket(rebal_date, w_brvm30,
     Retourne {ticker: poids_final} normalisé à 1.
 
     Stratégie hybride (identique à rebalance_live.py) :
-      - Top N titres (par poids BRVM30) : tenus à leur poids BRVM30 exact via OTC.
+      - Top N titres (par poids BRVMCI) : tenus à leur poids BRVMCI exact via OTC.
       - Titres restants : cap sur le DELTA depuis old_basket + redistribution
         itérative vers les non-capés non-top5 uniquement.
     ADV = moyenne sur le trimestre calendaire précédant rebal_date.
@@ -177,7 +196,8 @@ def build_basket(rebal_date, w_brvm30,
     w_norm = {tk: v / total_brvm30 for tk, v in w_brvm30.items()}
 
     adv_map  = {tk: compute_adv(tk, rebal_date) for tk in w_norm}
-    exclu    = {tk for tk in w_norm if adv_map.get(tk, 0) < MIN_ADV_MFCFA}
+    exclu    = {tk for tk in w_norm if adv_map.get(tk, 0) < MIN_ADV_MFCFA
+                                    or w_norm[tk] < MIN_INDEX_WEIGHT}
     eligible = [tk for tk in w_norm if tk not in exclu]
 
     if not eligible:
@@ -556,7 +576,7 @@ def build_nav_pr_prog(all_dates, sh, rb_dates, wh, exec_days_map,
 nav_gross_prog, nav_net_prog = build_nav_pr_prog(all_dates, sh, rebal_dates, w_history, exec_days_map)
 print("   NAV progressive: %.2f → %.2f" % (nav_net_prog.iloc[0], nav_net_prog.iloc[-1]))
 
-# ── Benchmark BRVM30 PR ───────────────────────────────────────────────────────
+# ── Benchmark BRVMCI PR ───────────────────────────────────────────────────────
 base_val   = brvm30_raw[START_DATE]
 bench_dict = {d: v / base_val * 100 for d, v in brvm30_raw.items()}
 
@@ -652,12 +672,13 @@ bm.update({
         # ── Composition du panier ─────────────────────────────────────────
         'methode':                   'Hybride OTC top-N + ADV-cap redistribution',
         'force_top_n':               FORCE_TOP_N,
-        'force_top_n_note':          f'Top {FORCE_TOP_N} titres BRVM30 tenus à leur poids exact via OTC (no ADV constraint)',
+        'force_top_n_note':          f'Top {FORCE_TOP_N} titres BRVMCI tenus à leur poids exact via OTC (no ADV constraint)',
         'max_exec_large_days':       MAX_EXEC_LARGE,
         'max_exec_small_days':       MAX_EXEC_SMALL,
         'large_threshold_pct':       LARGE_THRESHOLD * 100,
         'participation_rate_pct':    PARTICIPATION_RATE * 100,
         'min_adv_mfcfa':             MIN_ADV_MFCFA,
+        'min_index_weight_pct':      MIN_INDEX_WEIGHT * 100,
         'min_basket_weight_pct':     MIN_BASKET_WEIGHT * 100,
         # ── Rebalancement ────────────────────────────────────────────────
         'rebal_cible_freq':          'trimestriel (jan/avr/jul/oct)',
@@ -849,7 +870,7 @@ for aum in AUM_PALIERS:
             bsk = _get_weights(w_history, closest_rd)
         wh_sc[rb] = bsk
 
-        # Titres plafonnés = ceux dont le poids ETF < poids BRVM30 normalisé aux éligibles
+        # Titres plafonnés = ceux dont le poids ETF < poids BRVMCI normalisé aux éligibles
         eligible_b30 = {tk: w for tk, w in w_b30.items() if tk in bsk}
         tot_elig = sum(eligible_b30.values()) or 1.0
         w_b30_norm = {tk: v / tot_elig for tk, v in eligible_b30.items()}
@@ -927,7 +948,7 @@ print()
 print("=== TERMINÉ ===")
 print("NAV net PR : %.2f → %.2f  (TD = %+.2f%%)" % (
     nav_net_pr.iloc[0], nav_net_pr.iloc[-1], td_net*100))
-print("BRVM30 PR  : %.2f → %.2f" % (bench_s.iloc[0], bench_s.iloc[-1]))
+print("BRVMCI PR  : %.2f → %.2f" % (bench_s.iloc[0], bench_s.iloc[-1]))
 print("TE nette : %.2f%%   TE brute : %.2f%%" % (te_net*100, te_gross*100))
 print()
 print("Paramètres de sélection documentés :")
