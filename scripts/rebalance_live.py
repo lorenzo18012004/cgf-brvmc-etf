@@ -279,7 +279,7 @@ def main():
         sys.exit(0)
 
     mode = "DRY-RUN (prévisualisation)" if dry_run else "APPLICATION RÉELLE"
-    print(f"=== REBALANCEMENT BRVM30 ETF — {today} [{mode}] ===")
+    print(f"=== REBALANCEMENT BRVMC ETF — {today} [{mode}] ===")
     print()
 
     # ── Chargement ────────────────────────────────────────────────────────────

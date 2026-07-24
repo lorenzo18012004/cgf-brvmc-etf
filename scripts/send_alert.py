@@ -81,7 +81,7 @@ class AlertSender(BaseScript):
         ts     = datetime.now().strftime("%d/%m/%Y %H:%M")
 
         if test:
-            alerts.append(("TEST", "Ceci est un email de test du systeme d alerte CGF BRVM30 ETF."))
+            alerts.append(("TEST", "Ceci est un email de test du systeme d alerte CGF BRVMC ETF."))
         else:
             change_1d = nl.get("change_1d_pct")
             age       = nl.get("data_age_biz_days", 0)
@@ -120,24 +120,24 @@ class AlertSender(BaseScript):
 
         body = f"""
 <html><body style="font-family:Arial,sans-serif;color:#1e293b;max-width:600px">
-<h2 style="color:#dc2626">⚠ Alerte CGF BRVM30 ETF — {ts}</h2>
+<h2 style="color:#dc2626">⚠ Alerte CGF BRVMC ETF — {ts}</h2>
 <table style="border-collapse:collapse;width:100%;margin-bottom:16px">
   <tr style="background:#f1f5f9"><th style="padding:8px 12px;text-align:left">Alerte</th><th style="padding:8px 12px;text-align:left">Detail</th></tr>
   {rows}
 </table>
 <hr>
 <p><b>NAV indice :</b> {nav_val} &nbsp;|&nbsp; <b>VL / part :</b> {f"{int(vl_val):,}" if isinstance(vl_val,(int,float)) else vl_val} FCFA &nbsp;|&nbsp; <b>Date :</b> {calc_date}</p>
-<p style="color:#64748b;font-size:12px">Alerte automatique generee par le pipeline CGF BRVM30 ETF.</p>
+<p style="color:#64748b;font-size:12px">Alerte automatique generee par le pipeline CGF BRVMC ETF.</p>
 </body></html>"""
 
-        subject = f"[CGF BRVM30 ETF] {len(alerts)} alerte(s) — {ts}"
+        subject = f"[CGF BRVMC ETF] {len(alerts)} alerte(s) — {ts}"
         ok = self._send_email(cfg, subject, body)
         if ok:
             print(f"[OK] Email envoye ({len(alerts)} alerte(s)) → {', '.join(cfg['recipients'])}")
         return alerts
 
     def run(self):
-        parser = argparse.ArgumentParser(description="Alertes email CGF BRVM30 ETF")
+        parser = argparse.ArgumentParser(description="Alertes email CGF BRVMC ETF")
         parser.add_argument("--test",  action="store_true", help="Envoyer un email de test")
         parser.add_argument("--force", action="store_true", help="Envoyer meme si pas d alerte")
         args = parser.parse_args()

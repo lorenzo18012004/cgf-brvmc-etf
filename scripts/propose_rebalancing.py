@@ -77,7 +77,7 @@ class RebalancingProposer(BaseScript):
 
         body = (
             f"Bonjour,\n\n"
-            f"Un nouveau rebalancement du BRVM30 ETF est proposé pour le {rd}.\n\n"
+            f"Un nouveau rebalancement du BRVMC ETF est proposé pour le {rd}.\n\n"
             f"CHANGEMENTS DE COMPOSITION :\n"
             f"  → Entrants ({len(entries)}) : {', '.join(entries) or 'aucun'}\n"
             f"  → Sortants ({len(exits)})   : {', '.join(exits) or 'aucun'}\n\n"
@@ -97,7 +97,7 @@ class RebalancingProposer(BaseScript):
         msg = MIMEMultipart()
         msg["From"]    = gmail_user
         msg["To"]      = ", ".join(self.recipients)
-        msg["Subject"] = f"[CGF BRVM30 ETF] Rebalancement proposé — {rd}"
+        msg["Subject"] = f"[CGF BRVMC ETF] Rebalancement proposé — {rd}"
         msg.attach(MIMEText(body, "plain"))
 
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:

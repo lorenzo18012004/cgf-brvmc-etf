@@ -1,5 +1,5 @@
 """
-generate_daily_report.py — Bulletin quotidien de VL CGF BRVM30 ETF
+generate_daily_report.py — Bulletin quotidien de VL CGF BRVMC ETF
 Usage : python generate_daily_report.py [--date YYYY-MM-DD] [--force]
 """
 import os, re, warnings
@@ -358,7 +358,7 @@ class ReportGenerator(BaseScript):
             if bv and brvm_al: bp[pd.Timestamp(d)] = float(bv)/brvm_al*100
         es = pd.Series(ep).sort_index(); bs = pd.Series(bp).sort_index()
         xs = list(range(len(es)))
-        ax.plot(xs, es.values, color='#1a3557', lw=2.2, marker='o', ms=5, label='CGF BRVM30 ETF')
+        ax.plot(xs, es.values, color='#1a3557', lw=2.2, marker='o', ms=5, label='CGF BRVMC ETF')
         if not bs.empty:
             bv_aligned = bs.reindex(es.index)
             ax.plot(xs, bv_aligned.values, color='#b8922f', lw=1.8,
@@ -551,7 +551,7 @@ class ReportGenerator(BaseScript):
         par         = float(launch.get('par_fcfa', 100000))
         launch_date = launch.get('launch_date', report_date)
         n_parts     = int(launch.get('n_parts', 0))
-        etf_name    = nl.get('etf_name', 'CGF BRVM30 ETF')
+        etf_name    = nl.get('etf_name', 'CGF BRVMC ETF')
 
         snaps = ih.get(report_date) or intra.get('snapshots', [])
         last  = snaps[-1] if snaps else {}

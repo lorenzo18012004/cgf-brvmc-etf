@@ -3,7 +3,7 @@
 # si un titre monte trop dans l'indice faut etre capable de s'adapter.
 # 
 # 
-# CGF ETF Dashboard — BRVM30 ETF
+# CGF ETF Dashboard — BRVMC ETF
 """
 import json, os, re, sys, subprocess, base64, requests
 import streamlit as st
@@ -493,7 +493,7 @@ BRVM30_DIR = DATA_DIR if os.path.exists(os.path.join(DATA_DIR, "nav_latest.json"
 sys.path.insert(0, os.path.join(BASE, "scripts"))
 
 # Sur Streamlit Cloud, les fichiers live sont lus depuis GitHub (toujours frais)
-_GITHUB_RAW_DEFAULT = "https://raw.githubusercontent.com/lorenzo18012004/cgf-brvm30-etf/main"
+_GITHUB_RAW_DEFAULT = "https://raw.githubusercontent.com/lorenzo18012004/cgf-brvmc-etf/main"
 _GITHUB_RAW   = _GITHUB_RAW_DEFAULT   # fallback public repo — pas besoin de secret
 _GITHUB_TOKEN = None
 _GITHUB_REPO  = None
@@ -504,7 +504,7 @@ try:
 except Exception:
     pass
 
-_VERIFIED_GH_PATH = "test_BRVM30/verified_rebals.json"
+_VERIFIED_GH_PATH = "test_BRVMC/verified_rebals.json"
 
 def _gh_get_verified():
     """Lit verified_rebals.json depuis l'API GitHub. Retourne (dict, sha)."""
@@ -633,7 +633,7 @@ def _github_reachable():
     if not _GITHUB_RAW:
         return True
     try:
-        r = requests.get(f"{_GITHUB_RAW}/test_BRVM30/nav_latest.json", timeout=5)
+        r = requests.get(f"{_GITHUB_RAW}/test_BRVMC/nav_latest.json", timeout=5)
         return r.status_code == 200
     except Exception:
         return False
@@ -851,7 +851,7 @@ _github_offline = _GITHUB_RAW and not _github_reachable()
 _ALL_SEC_LABELS = {
     "overview": "Vue d'ensemble", "performance": "Performance",
     "te": "Tracking Error", "composition": "Composition ETF",
-    "indice": "Composition BRVM30", "rebalancements": "Rebalancements",
+    "indice": "Composition BRVMC", "rebalancements": "Rebalancements",
     "stress": "Stress Tests", "scalabilite": "Scalabilité",
     "walkforward": "Walk-Forward", "methodologie": "Méthodologie",
     "situation": "Situation actuelle",
@@ -902,7 +902,7 @@ def _build_excel_complet(_cache_key = ""):
         # Seule perf_since_launch est une vraie métrique live.
         # perf_ytd / 3m / 1y / vol / sharpe / maxDD viennent du backtest → exclus.
         _met = {
-            "ETF":                     _nl.get("etf_name", "CGF BRVM30 ETF"),
+            "ETF":                     _nl.get("etf_name", "CGF BRVMC ETF"),
             "Date_calcul":             _nl.get("calc_date"),
             "VL_par_part_FCFA":        _nl.get("vl_par_part_fcfa"),
             "NAV_indice_live":         _nl.get("nav_indice"),
@@ -986,14 +986,14 @@ def _build_excel_complet(_cache_key = ""):
                 pd.DataFrame(_rows_adj).to_excel(writer, sheet_name="Cours_ajustes_live",  index=False)
                 pd.DataFrame(_rows_vol).to_excel(writer, sheet_name="Volumes_live",        index=False)
 
-        # ── 7. Indice BRVM30 officiel LIVE (depuis lancement) ─────────────────
+        # ── 7. Indice BRVMC officiel LIVE (depuis lancement) ─────────────────
         _idx_path = os.path.join(BRVM30_DIR, "brvm30_index_history.json")
         if os.path.exists(_idx_path):
             with open(_idx_path, "r", encoding="utf-8") as _f:
                 _idx = json.load(_f)
-            _idx_rows = [{"Date": d, "BRVM30": v} for d, v in sorted(_idx.items()) if d >= _launch_date]
+            _idx_rows = [{"Date": d, "BRVMC": v} for d, v in sorted(_idx.items()) if d >= _launch_date]
             if _idx_rows:
-                pd.DataFrame(_idx_rows).to_excel(writer, sheet_name="Indice_BRVM30_live", index=False)
+                pd.DataFrame(_idx_rows).to_excel(writer, sheet_name="Indice_BRVMC_live", index=False)
 
     return output.getvalue()
 
@@ -1007,7 +1007,7 @@ def _render_landing():
     st.markdown("""
     <div class="landing-outer">
         <p class="landing-brand">CGF Bourse &nbsp;·&nbsp; Afrique de l'Ouest</p>
-        <h1 class="landing-title">BRVM30 ETF</h1>
+        <h1 class="landing-title">BRVMC ETF</h1>
         <p class="landing-sub">Suivi en temps réel &nbsp;·&nbsp; Performance &nbsp;·&nbsp; Gestion</p>
         <div class="landing-cards">
             <a href="?page=backtest" class="lcard" target="_self">
@@ -1059,7 +1059,7 @@ _bt_labels = {
     "performance":    "Performance",
     "te":             "Tracking Error",
     "composition":    "Composition ETF",
-    "indice":         "Composition BRVM30",
+    "indice":         "Composition BRVMC",
     "rebalancements": "Rebalancements",
     "stress":         "Stress Tests",
     "scalabilite":    "Scalabilité",
@@ -1191,7 +1191,7 @@ if _page == "backtest":
         ("performance",    "Performance"),
         ("te",             "Tracking Error"),
         ("composition",    "Composition ETF"),
-        ("indice",         "Composition BRVM30"),
+        ("indice",         "Composition BRVMC"),
         ("rebalancements", "Rebalancements"),
         ("stress",         "Stress Tests"),
         ("scalabilite",    "Scalabilité"),
@@ -2453,7 +2453,7 @@ def _render_backtest():
             r"w_i^{\text{rest}} = \frac{w_i^{\text{BRVM30}}}{\displaystyle\sum_{k \in \text{restants}} w_k^{\text{BRVM30}}} \times w_{\text{budget}} \geq 0{,}1\%",
             legend=[
                 "w_i^rest = poids du titre i parmi les 25 titres ADV-capped (normalisé au budget restant)",
-                "w_i^BRVM30 = poids brut du titre i dans l'indice BRVM30 officiel",
+                "w_i^BRVM30 = poids brut du titre i dans l'indice BRVMC officiel",
                 "w_budget = 1 − Σ(poids top 5 OTC) ≈ 40−50 % du panier",
             ],
             note="Si w_rest < 0,1 % → titre exclu et budget redistribué. "
@@ -2579,7 +2579,7 @@ def _render_live():
         st.markdown(f"""
         <div class="landing-outer" style="min-height:55vh">
             <p class="landing-brand">CGF BOURSE · Live</p>
-            <h1 class="landing-title" style="font-size:1.7rem">BRVM30 ETF — Production</h1>
+            <h1 class="landing-title" style="font-size:1.7rem">BRVMC ETF — Production</h1>
             <p class="landing-sub" style="margin-bottom:32px">Depuis le lancement · {_launch_date_label}</p>
             <div class="landing-cards" style="flex-wrap:wrap; justify-content:center; max-width:560px; gap:14px">
                 <a href="?page=live&section=situation" class="lcard" target="_self">
@@ -2872,7 +2872,7 @@ def _render_live():
                 _dr_txt = f"{_days_remaining}j" if _days_remaining >= 0 else "Dépassé"
                 st.markdown(f"""
                 <div class="kpi-card">
-                  <div class="kpi-card-hd">Rebalancement BRVM30</div>
+                  <div class="kpi-card-hd">Rebalancement BRVMC</div>
                   <div style="display:flex;flex-wrap:wrap">
                     {_kc("Dernier", _last_rebal_dt.strftime("%d/%m/%Y"))}
                     {_kc("Prochain (est.)", _next_rebal_str)}
@@ -2893,7 +2893,7 @@ def _render_live():
             else:
                 st.markdown("""
                 <div class="kpi-card">
-                  <div class="kpi-card-hd">Rebalancement BRVM30</div>
+                  <div class="kpi-card-hd">Rebalancement BRVMC</div>
                   <div style="padding:20px 22px;color:#7d8fa3;font-size:0.75rem">Données indisponibles</div>
                 </div>""", unsafe_allow_html=True)
 
@@ -2941,7 +2941,7 @@ def _render_live():
                 intra_hist_path = os.path.join(BRVM30_DIR, "nav_intraday_history.json")
                 intra_hist = load_json(intra_hist_path) or {}
 
-                # Charger historique de l'indice BRVM30 officiel
+                # Charger historique de l'indice BRVMC officiel
                 _brvm30_hist_path = os.path.join(BRVM30_DIR, "brvm30_index_history.json")
                 _brvm30_hist = load_json(_brvm30_hist_path) or {}
                 # Valeur de référence = clôture officielle BRVM30 le jour du lancement
@@ -3015,7 +3015,7 @@ def _render_live():
                     fig_main.add_hline(y=par, line_dash="dot", line_color="#ccc5b9",
                                        annotation_text=f"Émission {par:,.0f}")
                     fig_main.update_layout(**PLOTLY_LAYOUT, height=380,
-                        title=f"VL CGF BRVM30 ETF — depuis le {launch_date}",
+                        title=f"VL CGF BRVMC ETF — depuis le {launch_date}",
                         yaxis_title="FCFA / part", hovermode="x unified",
                         yaxis_range=[_vmin - _pad, _vmax + _pad],
                         legend=dict(orientation="h", y=-0.14))
@@ -3074,7 +3074,7 @@ def _render_live():
                     fig_cmp = go.Figure()
                     fig_cmp.add_trace(go.Scatter(
                         x=etf_s.index, y=etf_s.values,
-                        name="CGF BRVM30 ETF",
+                        name="CGF BRVMC ETF",
                         mode="lines+markers",
                         line=dict(color=COLOR, width=2.5),
                         marker=dict(size=6, color=COLOR),
@@ -3116,7 +3116,7 @@ def _render_live():
                             _lp = _pts[-1]
                             _v  = _lp.get("vl_fcfa") or _lp.get("vl")
                             if _v: _raw_vl[_dt] = float(_v)
-                    # Indice BRVM30 officiel depuis brvm30_index_history.json (jours ouvrés uniquement)
+                    # Indice BRVMC officiel depuis brvm30_index_history.json (jours ouvrés uniquement)
                     for _d, _bv in _brvm30_hist.items():
                         _dt = pd.Timestamp(_d).normalize()
                         if _dt >= _t0 and _dt.weekday() < 5:
@@ -3247,7 +3247,7 @@ def _render_live():
                         showlegend=False, hovermode="x unified")
                     st.plotly_chart(fig_intra, width='stretch')
                 with col_g2:
-                    # Indice BRVM30 officiel intraday (pts)
+                    # Indice BRVMC officiel intraday (pts)
                     idx_pts_all = [s.get("brvm30_official") for s in _intra_snaps]
                     idx_valid   = [(t, v) for t, v in zip(times, idx_pts_all) if v is not None]
                     if idx_valid:
@@ -3496,7 +3496,7 @@ def _render_live():
                             _sp  = _snaps_c[_ai]
                             _t   = times_c[_ai]; _t0 = times_c[_ai - 1]
                             _etf_d = round(etf_base100[_ai] - etf_base100[_ai-1], 3)
-                            # BRVM30 officiel Sika (peut rester figé 15-30 min entre MAJ)
+                            # BRVMC officiel Sika (peut rester figé 15-30 min entre MAJ)
                             _idx_d_off = round((idx_base100[_ai] or 0) - (idx_base100[_ai-1] or 0), 3) if idx_base100[_ai] and idx_base100[_ai-1] else None
                             # BRVM30* estimé depuis nos propres prix (synchrone avec l'iNAV)
                             _tc_ai = _sp.get('ticker_contributions', {})
@@ -6273,7 +6273,7 @@ def _render_live():
 # ══════════════════════════════════════════════════════════════════════════════
 class Dashboard:
     """
-    Dashboard CGF BRVM30 ETF — structure orientée objet.
+    Dashboard CGF BRVMC ETF — structure orientée objet.
 
     Chaque section est une méthode dédiée pour faciliter la navigation et
     la maintenance du code par l'équipe.

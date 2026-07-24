@@ -276,7 +276,7 @@ class IntradayScraperCloud(BaseScript):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="iNAV CGF BRVM30 ETF -- cloud (no Excel)")
+    parser = argparse.ArgumentParser(description="iNAV CGF BRVMC ETF -- cloud (no Excel)")
     parser.add_argument("--force", action="store_true", help="Forcer meme hors heures de marche")
     args = parser.parse_args()
     result = IntradayScraperCloud().run(force=args.force)

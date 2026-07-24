@@ -1,5 +1,5 @@
 """
-generate_monthly_report.py — Rapport mensuel CGF BRVM30 ETF
+generate_monthly_report.py — Rapport mensuel CGF BRVMC ETF
 Usage : python generate_monthly_report.py [--month YYYY-MM] [--force]
 """
 import os, warnings
@@ -195,7 +195,7 @@ class MonthlyReportGenerator(BaseScript):
         brvm_b100 = [r['brvm30'] / first_bv * 100 if r['brvm30'] and first_bv else None for r in rows]
         xs     = list(range(len(rows)))
         labels = [pd.Timestamp(r['date']).strftime('%d/%m') for r in rows]
-        ax.plot(xs, etf_b100, color='#1a3557', lw=2.2, marker='o', ms=4, label='CGF BRVM30 ETF')
+        ax.plot(xs, etf_b100, color='#1a3557', lw=2.2, marker='o', ms=4, label='CGF BRVMC ETF')
         valid_b = [(i, v) for i, v in enumerate(brvm_b100) if v is not None]
         if valid_b:
             xi, yi = zip(*valid_b)
@@ -267,7 +267,7 @@ class MonthlyReportGenerator(BaseScript):
         brvm_h = self._load('brvm30_index_history.json') or {}
 
         par        = float(launch.get('par_fcfa', 100000))
-        etf_name   = nl.get('etf_name', 'CGF BRVM30 ETF')
+        etf_name   = nl.get('etf_name', 'CGF BRVMC ETF')
         brvm_al    = float(launch.get('brvm30_index_at_launch') or 0) or None
 
         rows = self._month_data(year, month)

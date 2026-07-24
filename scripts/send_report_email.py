@@ -25,11 +25,11 @@ class ReportEmailSender(BaseScript):
         msg = MIMEMultipart()
         msg['From']    = gmail_user
         msg['To']      = recipients_str
-        msg['Subject'] = f"CGF BRVM30 ETF — Rapport journalier {date_str}"
+        msg['Subject'] = f"CGF BRVMC ETF — Rapport journalier {date_str}"
 
         body = (
             f"Bonjour,\n\n"
-            f"Veuillez trouver ci-joint le rapport journalier du fonds CGF BRVM30 ETF "
+            f"Veuillez trouver ci-joint le rapport journalier du fonds CGF BRVMC ETF "
             f"pour la séance du {date_str}.\n\n"
             f"Cordialement,\n"
             f"CGF Bourse — Système automatique"
@@ -55,10 +55,10 @@ class ReportEmailSender(BaseScript):
         outlook = win32com.client.Dispatch("Outlook.Application")
         mail    = outlook.CreateItem(0)
         mail.To      = "; ".join(self.RECIPIENTS)
-        mail.Subject = f"CGF BRVM30 ETF — Rapport journalier {date_str}"
+        mail.Subject = f"CGF BRVMC ETF — Rapport journalier {date_str}"
         mail.Body    = (
             f"Bonjour,\n\n"
-            f"Veuillez trouver ci-joint le rapport journalier du fonds CGF BRVM30 ETF "
+            f"Veuillez trouver ci-joint le rapport journalier du fonds CGF BRVMC ETF "
             f"pour la séance du {date_str}.\n\n"
             f"Cordialement,\n"
             f"CGF Bourse — Système automatique"

@@ -1,5 +1,5 @@
 """
-generate_periodic_reports.py — Rapports semestriel et annuel CGF BRVM30 ETF
+generate_periodic_reports.py — Rapports semestriel et annuel CGF BRVMC ETF
 Usage :
   python generate_periodic_reports.py --period semiannual --year 2026 --semester 1 [--force]
   python generate_periodic_reports.py --period annual     --year 2026               [--force]
@@ -215,7 +215,7 @@ class PeriodicReportGenerator(BaseScript):
         etf_b100  = [r['vl'] / v0 * 100 for r in rows]
         brvm_b100 = [r['brvm30'] / b0 * 100 if r['brvm30'] and b0 else None for r in rows]
         xs     = list(range(len(rows)))
-        ax.plot(xs, etf_b100, color='#1a3557', lw=2.0, label='CGF BRVM30 ETF')
+        ax.plot(xs, etf_b100, color='#1a3557', lw=2.0, label='CGF BRVMC ETF')
         valid_b = [(i, v) for i, v in enumerate(brvm_b100) if v is not None]
         if valid_b:
             xi, yi = zip(*valid_b)
@@ -365,7 +365,7 @@ class PeriodicReportGenerator(BaseScript):
         nl      = self._load('nav_latest.json') or {}
         launch  = self._load('launch_state.json') or {}
         par     = float(launch.get('par_fcfa', 100000))
-        etf_name= nl.get('etf_name', 'CGF BRVM30 ETF')
+        etf_name= nl.get('etf_name', 'CGF BRVMC ETF')
         basket  = nl.get('basket', [])
 
         rows = self._period_rows(date_from, date_to)
@@ -389,7 +389,7 @@ class PeriodicReportGenerator(BaseScript):
         nl       = self._load('nav_latest.json') or {}
         launch   = self._load('launch_state.json') or {}
         par      = float(launch.get('par_fcfa', 100000))
-        etf_name = nl.get('etf_name', 'CGF BRVM30 ETF')
+        etf_name = nl.get('etf_name', 'CGF BRVMC ETF')
         basket   = nl.get('basket', [])
 
         rows = self._period_rows(f'{year}-01-01', f'{year}-12-31')

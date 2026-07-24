@@ -480,7 +480,7 @@ class CorporateActionsChecker(BaseScript):
         body_html = f"""
     <html><body style="font-family:Inter,sans-serif;color:#0c1a2e;max-width:800px;margin:0 auto;padding:24px">
       <h2 style="color:#0c1a2e;border-bottom:2px solid #b8973f;padding-bottom:8px">
-        CGF BRVM30 ETF — Alerte Actions Corporatives {today_str}
+        CGF BRVMC ETF — Alerte Actions Corporatives {today_str}
       </h2>
       {section_anomalies}
       {section_calendar}
