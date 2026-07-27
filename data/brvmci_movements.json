@@ -1,0 +1,18 @@
+{
+  "movements": [
+    {
+      "date": "2025-01-02",
+      "type": "introduction",
+      "ticker": "LNBB",
+      "nom": "",
+      "note": ""
+    },
+    {
+      "date": "2025-07-01",
+      "type": "introduction",
+      "ticker": "BICB",
+      "nom": "",
+      "note": ""
+    }
+  ]
+}
