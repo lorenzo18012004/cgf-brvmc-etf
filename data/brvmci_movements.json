@@ -1,13 +1,6 @@
 {
   "movements": [
     {
-      "date": "2025-01-02",
-      "type": "introduction",
-      "ticker": "LNBB",
-      "nom": "",
-      "note": ""
-    },
-    {
       "date": "2025-06-27",
       "type": "radiation",
       "ticker": "SVOC",
