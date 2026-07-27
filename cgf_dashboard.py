@@ -3919,6 +3919,13 @@ def _render_live():
 
                 df_basket = pd.DataFrame(nl["basket"])
 
+                # Champs optionnels absents avant le premier run cloud
+                _aum_mfcfa_live = float(nl.get("aum_mfcfa") or 0)
+                if "pv_mfcfa" not in df_basket.columns:
+                    df_basket["pv_mfcfa"] = (df_basket["poids_pct"] / 100.0 * _aum_mfcfa_live).round(1)
+                if "prix_stale" not in df_basket.columns:
+                    df_basket["prix_stale"] = False
+
                 # Poids cibles du dernier rebalancement (capés par ADV)
                 _rd_live = load_json(os.path.join(BRVM30_DIR, "rebal_detail.json")) or {}
                 _rebals_live = [r for r in _rd_live.get("rebalancings", []) if not r.get("skipped") and r.get("basket")]
