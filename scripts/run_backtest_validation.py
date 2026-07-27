@@ -93,20 +93,31 @@ print(f"   Dividendes : {sum(len(v) for v in _div_calendar.values())} versements
 w_history   = dd['w_history']
 rebal_dates = sorted(w_history.keys())
 
-# Poids BRVMCI par ticker à chaque rebalancement (depuis rebal_detail)
+# Poids BRVMCI bruts par ticker à chaque rebalancement (depuis rebal_detail)
 brvm30_weights_hist = {}   # {rebal_date: {ticker: w_brvmci}}
 for r in rd.get('rebalancings', []):
     dt = r.get('date', '')
-    basket   = r.get('basket',   [])
-    excluded = r.get('excluded', [])
     w_map = {}
-    for item in basket + excluded:
+    for item in r.get('basket', []) + r.get('excluded', []):
         tk = item.get('ticker')
         w  = item.get('w_brvm30', 0.0)
         if tk and w:
             w_map[tk] = w
     if w_map:
         brvm30_weights_hist[dt] = w_map
+
+# Poids ETF capés par trimestre (w_etf depuis rebal_detail — après redistribution ADV)
+etf_w_history = {}   # {rebal_date: {ticker: w_etf}}
+for r in rd.get('rebalancings', []):
+    dt = r.get('date', '')
+    w_map = {}
+    for item in r.get('basket', []):
+        tk = item.get('ticker')
+        w  = item.get('w_etf', 0.0)
+        if tk and w:
+            w_map[tk] = w
+    if w_map:
+        etf_w_history[dt] = w_map
 
 # ── BRVMCI PR depuis Sika (brvm30_index_history.json) ────────────────────────
 print("[2/6] Lecture BRVMCI PR depuis Sika…")
@@ -272,7 +283,7 @@ print("[3/6] Reconstruction NAV Price Return…")
 
 
 def _get_weights(wh, date_key):
-    val = wh[date_key]
+    val = wh.get(date_key) or {}
     if isinstance(val, dict):
         return val
     if isinstance(val, list) and len(val) == 2 and isinstance(val[1], dict):
@@ -288,18 +299,19 @@ def build_nav_tr(all_dates, sh, rb_dates, wh,
                  fee_ann=MGMT_FEE_ANN,
                  div_cal=None,
                  adv_at_rebal=None,
-                 monthly_rebal=True,
-                 drift_threshold=0.01):
+                 monthly_rebal=False,
+                 drift_threshold=0.01,
+                 track_rebal=False):
     """
-    Retourne (nav_gross_pr, nav_net_pr, nav_dist_series).
+    Retourne (nav_gross_pr, nav_net_pr, nav_dist_series, total_turnover, rebal_log).
     ETF Price Return : cours des actions (PR) + dividendes collectés en réserve,
-    distribués semestriellement (fin juin / fin décembre). Même mécanisme que BRVM30.
+    distribués semestriellement (fin juin / fin décembre).
 
     Rebalancement :
-      - Trimestriel : mise à jour de la cible (nouvelle composition du panier)
-      - Mensuel (si monthly_rebal=True) : vérification de la dérive vs cible
-        → on ne trade que les titres dont |w_actuel - w_cible| > drift_threshold
-        → réduit les transactions et donc les frais, tout en limitant la dérive
+      - Trimestriel uniquement (monthly_rebal=False) : remise aux poids-cibles ETF capés
+        à chaque début de trimestre, le portefeuille dérive librement entre-temps.
+      - Mensuel (monthly_rebal=True, usage stress tests) : vérification de dérive vs cible
+        → ne trade que les titres dont |w_actuel - w_cible| > drift_threshold
 
     Modèle de coûts :
       - Spread variable par titre selon son ADV (spread_one_way())
@@ -323,7 +335,8 @@ def build_nav_tr(all_dates, sh, rb_dates, wh,
     div_reserve_gross = 0.0
     div_reserve_net   = 0.0
     nav_dist_series   = {}
-    total_turnover    = 0.0   # cumul de tous les trades (trimestriels + corrections mensuelles)
+    total_turnover    = 0.0
+    rebal_log         = {}   # {date: {turnover, cost_bps, nav_after}} si track_rebal
 
     rb_idx       = 0
     target_w     = dict(_get_weights(wh, rb_dates[0]))
@@ -424,21 +437,28 @@ def build_nav_tr(all_dates, sh, rb_dates, wh,
                                  for tk, v in new_w_partial.items() if v > 0}
 
         elif not monthly_rebal and target_updated:
-            # Mode trimestriel classique : rebalancement complet à chaque cible
+            # Rebalancement trimestriel complet : remise aux poids-cibles ETF capés
             all_tks     = set(portfolio) | set(target_w)
             total_port  = sum(portfolio.values()) or 1.0
             curr_w_norm = {tk: v / total_port for tk, v in portfolio.items()}
             adv_rb = adv_at_rebal.get(rb_dates[rb_idx], {})
+            q_to = sum(abs(target_w.get(t, 0) - curr_w_norm.get(t, 0))
+                       for t in all_tks) / 2
             cost_rebal = sum(
                 abs(target_w.get(t, 0) - curr_w_norm.get(t, 0)) *
                 spread_one_way(adv_rb.get(t, compute_adv(t, rb_dates[rb_idx])))
                 for t in all_tks
-            )  # spread one-way appliqué sur chaque trade (achat ET vente paient chacun)
-            total_turnover += sum(abs(target_w.get(t, 0) - curr_w_norm.get(t, 0))
-                                  for t in all_tks) / 2
+            )
+            total_turnover += q_to
             nav_gross *= (1 - cost_rebal)
             nav_net   *= (1 - cost_rebal)
             portfolio   = dict(target_w)
+            if track_rebal:
+                rebal_log[rb_dates[rb_idx]] = {
+                    'turnover': round(q_to, 6),
+                    'cost_bps': round(cost_rebal * 10000, 1),
+                    'nav_after': round(nav_net, 4),
+                }
 
         gross_pts[dt] = nav_gross
         net_pts[dt]   = nav_net
@@ -446,7 +466,8 @@ def build_nav_tr(all_dates, sh, rb_dates, wh,
     return (pd.Series(gross_pts, dtype=float),
             pd.Series(net_pts,   dtype=float),
             nav_dist_series,
-            total_turnover)
+            total_turnover,
+            rebal_log)
 
 
 # ── Pré-calcul de l'ADV par titre à chaque rebal (évite de recalculer en boucle)
@@ -460,12 +481,14 @@ for _rb in rebal_dates:
                     _adv_rb[_item['ticker']] = _item['adv_mfcfa']
     _adv_at_rebal[_rb] = _adv_rb
 
-nav_gross_pr, nav_net_pr, _dist, _ = build_nav_tr(
-    all_dates, sh, rebal_dates, w_history, adv_at_rebal=_adv_at_rebal
+# Rebalancement trimestriel avec poids ETF capés (w_etf depuis rebal_detail)
+_wh_main = etf_w_history if etf_w_history else w_history
+nav_gross_pr, nav_net_pr, _dist, _, _rebal_log = build_nav_tr(
+    all_dates, sh, rebal_dates, _wh_main,
+    adv_at_rebal=_adv_at_rebal,
+    monthly_rebal=False,
+    track_rebal=True,
 )
-# Alias pour compatibilité avec le reste du script
-nav_gross_pr = nav_gross_pr   # Price Return brut (distributions séparées)
-nav_net_pr   = nav_net_pr     # Price Return net de frais (distributions séparées)
 print("   NAV gross PR: %.2f → %.2f" % (nav_gross_pr.iloc[0], nav_gross_pr.iloc[-1]))
 print("   NAV net   PR: %.2f → %.2f" % (nav_net_pr.iloc[0],   nav_net_pr.iloc[-1]))
 if _dist:
@@ -660,6 +683,23 @@ m.update({'te': round(te_net, 6), 'te_gross': round(te_gross, 6),
           'td_gross': round(td_gross, 6), 'td_gross_ann': round(td_gross_ann, 6),
           'div_bench_factor': 1.0, 'div_etf_factor': 1.0})
 dd['metrics'] = m
+
+# Mise à jour rebal_history depuis le log trimestriel (turnover réel drift compris)
+if _rebal_log:
+    old_rh = {r['date']: r for r in dd.get('rebal_history', [])}
+    new_rh = []
+    for rd_date in rebal_dates:
+        old = old_rh.get(rd_date, {})
+        log = _rebal_log.get(rd_date, {})
+        new_rh.append({
+            'date':     rd_date,
+            'turnover': log.get('turnover', old.get('turnover', 0.0)),
+            'cost_bps': log.get('cost_bps', old.get('cost_bps', 0)),
+            'nav_after': log.get('nav_after', old.get('nav_after', 100.0)),
+            'skipped':  old.get('skipped', False),
+        })
+    dd['rebal_history'] = new_rh
+
 json.dump(dd, open(DD_PATH, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 
 # Mise à jour backtest_metrics.json avec les paramètres de sélection
@@ -683,10 +723,8 @@ bm.update({
         'min_index_weight_pct':      MIN_INDEX_WEIGHT * 100,
         'min_basket_weight_pct':     MIN_BASKET_WEIGHT * 100,
         # ── Rebalancement ────────────────────────────────────────────────
-        'rebal_cible_freq':          'trimestriel (jan/avr/jul/oct)',
-        'rebal_execution_freq':      'mensuel avec seuil de dérive',
-        'drift_threshold_pct':       1.0,
-        'drift_note':                'Trade uniquement si |w_actuel - w_cible| > 1% pour un titre',
+        'rebal_freq':                'trimestriel (jan/avr/jul/oct)',
+        'rebal_note':                'Remise aux poids ETF capés à chaque début de trimestre — pas de correction intermédiaire',
         # ── Coûts de transaction ─────────────────────────────────────────
         'spread_model':              'variable selon ADV : 25 bps (>=100 MFCFA) → 175 bps (<5 MFCFA)',
         'spread_25bps_above_mfcfa':  100,
@@ -744,9 +782,9 @@ def stress_with_selection(name, rebal_freq_months, fee=MGMT_FEE_ANN,
             old_bsk_stress = dict(bw)
         wh_new[rb] = bw if bw else _get_weights(w_history, closest_rd)
 
-    ng, nn, _, total_to = build_nav_tr(all_dates, sh, rb_new, wh_new, fee,
-                                       monthly_rebal=monthly_rebal,
-                                       drift_threshold=drift_threshold)
+    ng, nn, _, total_to, _ = build_nav_tr(all_dates, sh, rb_new, wh_new, fee,
+                                          monthly_rebal=monthly_rebal,
+                                          drift_threshold=drift_threshold)
     te_s, td_s, _ = compute_te_td(nn, bench_s)
 
     n_q   = max(len(rb_new) - 1, 1)
@@ -788,8 +826,8 @@ for threshold in [0.01, 0.02, 0.03, 0.05, 0.08, 0.10, 0.15]:
             old_bsk_thr = dict(bsk_thr)
         wh_sim[rb] = bsk_thr
 
-    ng, nn, _, _ = build_nav_tr(all_dates, sh, rebal_dates, wh_sim,
-                             monthly_rebal=True, drift_threshold=0.01)
+    ng, nn, _, _, _ = build_nav_tr(all_dates, sh, rebal_dates, wh_sim,
+                                monthly_rebal=True, drift_threshold=0.01)
     te_f, td_f, _ = compute_te_td(nn, bench_s)
     to_f = turnover_avg(wh_sim, rebal_dates)
     n_large_avg = int(np.mean([sum(1 for tk in wh_sim[d]
@@ -895,8 +933,8 @@ for aum in AUM_PALIERS:
         })
 
     # NAV complète sur tout l'historique avec ce panier (mensuel + dérive 1%)
-    ng_sc, nn_sc, _, _ = build_nav_tr(all_dates, sh, rebal_dates, wh_sc,
-                                   monthly_rebal=True, drift_threshold=0.01)
+    ng_sc, nn_sc, _, _, _ = build_nav_tr(all_dates, sh, rebal_dates, wh_sc,
+                                       monthly_rebal=True, drift_threshold=0.01)
     te_sc, td_sc, _ = compute_te_td(nn_sc, bench_s)
 
     # Turnover moyen

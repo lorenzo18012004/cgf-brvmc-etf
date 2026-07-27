@@ -10,10 +10,8 @@
     "min_adv_mfcfa": 0.5,
     "min_index_weight_pct": 0.1,
     "min_basket_weight_pct": 0.1,
-    "rebal_cible_freq": "trimestriel (jan/avr/jul/oct)",
-    "rebal_execution_freq": "mensuel avec seuil de dérive",
-    "drift_threshold_pct": 1.0,
-    "drift_note": "Trade uniquement si |w_actuel - w_cible| > 1% pour un titre",
+    "rebal_freq": "trimestriel (jan/avr/jul/oct)",
+    "rebal_note": "Remise aux poids ETF capés à chaque début de trimestre — pas de correction intermédiaire",
     "spread_model": "variable selon ADV : 25 bps (>=100 MFCFA) → 175 bps (<5 MFCFA)",
     "spread_25bps_above_mfcfa": 100,
     "spread_40bps_above_mfcfa": 30,
@@ -29,49 +27,49 @@
     "cash_buffer_pct": 1.0,
     "cash_buffer_note": "1% du NAV en cash, capitalisé au RF 3%/an"
   },
-  "te_full": 0.018742,
+  "te_full": 0.016306,
   "te_prog": 0.018049,
-  "td_full": 0.028924,
-  "td_full_ann": 0.00805,
-  "td_gross": 0.051856,
-  "td_gross_ann": 0.014317,
+  "td_full": -0.021733,
+  "td_full_ann": -0.006159,
+  "td_gross": 7e-05,
+  "td_gross_ann": 2e-05,
   "turnover_avg": 0.045232,
   "annual": [
     {
       "year": 2023,
-      "te": 0.016932,
-      "td": 0.028924,
-      "td_gross": 0.035308,
+      "te": 0.00904,
+      "td": -0.001858,
+      "td_gross": 0.004335,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": 0.035308
+      "basket_gap": 0.004335
     },
     {
       "year": 2024,
-      "te": 0.007437,
-      "td": -0.01698,
-      "td_gross": -0.010858,
+      "te": 0.006524,
+      "td": -0.008105,
+      "td_gross": -0.001927,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": -0.010858
+      "basket_gap": -0.001927
     },
     {
       "year": 2025,
-      "te": 0.016127,
-      "td": 0.023268,
-      "td_gross": 0.029592,
+      "te": 0.013812,
+      "td": -0.012315,
+      "td_gross": -0.006211,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": 0.029592
+      "basket_gap": -0.006211
     },
     {
       "year": 2026,
-      "te": 0.034322,
-      "td": -0.00577,
-      "td_gross": -0.002369,
+      "te": 0.033978,
+      "td": 0.000459,
+      "td_gross": 0.003882,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": -0.002369
+      "basket_gap": 0.003882
     }
   ]
 }

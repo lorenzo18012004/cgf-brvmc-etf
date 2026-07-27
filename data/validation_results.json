@@ -90,45 +90,45 @@
   ],
   "bootstrap": {
     "n_sim": 500,
-    "te_med": 0.018263,
-    "te_p5": 0.014263,
-    "te_p95": 0.022671
+    "te_med": 0.015867,
+    "te_p5": 0.01174,
+    "te_p95": 0.020096
   },
   "walk_forward": [
     {
       "label": "Jan–Déc 2023",
-      "te_is": 0.016932,
-      "te_oos": 0.007429,
-      "td_oos": -0.016328,
-      "delta_te": -0.009503
+      "te_is": 0.00904,
+      "te_oos": 0.006501,
+      "td_oos": -0.007384,
+      "delta_te": -0.002539
     },
     {
       "label": "Jan–Déc 2024",
-      "te_is": 0.007429,
-      "te_oos": 0.016158,
-      "td_oos": 0.023084,
-      "delta_te": 0.00873
+      "te_is": 0.006501,
+      "te_oos": 0.013839,
+      "td_oos": -0.012277,
+      "delta_te": 0.007338
     },
     {
       "label": "Jan–Déc 2025",
-      "te_is": 0.016158,
-      "te_oos": 0.010573,
-      "td_oos": 0.003385,
-      "delta_te": -0.005585
+      "te_is": 0.013839,
+      "te_oos": 0.004448,
+      "td_oos": -0.004112,
+      "delta_te": -0.009391
     },
     {
       "label": "2023–2024 IS/2025 OOS",
-      "te_is": 0.013118,
-      "te_oos": 0.016158,
-      "td_oos": 0.023084,
-      "delta_te": 0.003041
+      "te_is": 0.007868,
+      "te_oos": 0.013839,
+      "td_oos": -0.012277,
+      "delta_te": 0.005971
     },
     {
       "label": "2023–2025 IS/2026 OOS",
-      "te_is": 0.014176,
-      "te_oos": 0.010573,
-      "td_oos": 0.003385,
-      "delta_te": -0.003603
+      "te_is": 0.010215,
+      "te_oos": 0.004448,
+      "td_oos": -0.004112,
+      "delta_te": -0.005768
     }
   ],
   "selection_params": {
@@ -142,10 +142,8 @@
     "min_adv_mfcfa": 0.5,
     "min_index_weight_pct": 0.1,
     "min_basket_weight_pct": 0.1,
-    "rebal_cible_freq": "trimestriel (jan/avr/jul/oct)",
-    "rebal_execution_freq": "mensuel avec seuil de dérive",
-    "drift_threshold_pct": 1.0,
-    "drift_note": "Trade uniquement si |w_actuel - w_cible| > 1% pour un titre",
+    "rebal_freq": "trimestriel (jan/avr/jul/oct)",
+    "rebal_note": "Remise aux poids ETF capés à chaque début de trimestre — pas de correction intermédiaire",
     "spread_model": "variable selon ADV : 25 bps (>=100 MFCFA) → 175 bps (<5 MFCFA)",
     "spread_25bps_above_mfcfa": 100,
     "spread_40bps_above_mfcfa": 30,
