@@ -291,7 +291,9 @@ def build_nav_tr(all_dates, sh, rb_dates, wh,
                  monthly_rebal=True,
                  drift_threshold=0.01):
     """
-    Retourne (nav_gross_tr, nav_net_tr, nav_dist_series).
+    Retourne (nav_gross_pr, nav_net_pr, nav_dist_series).
+    ETF Price Return : cours des actions (PR) + dividendes collectés en réserve,
+    distribués semestriellement (fin juin / fin décembre). Même mécanisme que BRVM30.
 
     Rebalancement :
       - Trimestriel : mise à jour de la cible (nouvelle composition du panier)
@@ -464,8 +466,8 @@ nav_gross_pr, nav_net_pr, _dist, _ = build_nav_tr(
 # Alias pour compatibilité avec le reste du script
 nav_gross_pr = nav_gross_pr   # Price Return brut (distributions séparées)
 nav_net_pr   = nav_net_pr     # Price Return net de frais (distributions séparées)
-print("   NAV gross TR: %.2f → %.2f" % (nav_gross_pr.iloc[0], nav_gross_pr.iloc[-1]))
-print("   NAV net   TR: %.2f → %.2f" % (nav_net_pr.iloc[0],   nav_net_pr.iloc[-1]))
+print("   NAV gross PR: %.2f → %.2f" % (nav_gross_pr.iloc[0], nav_gross_pr.iloc[-1]))
+print("   NAV net   PR: %.2f → %.2f" % (nav_net_pr.iloc[0],   nav_net_pr.iloc[-1]))
 if _dist:
     print("   Distributions:", {d: f"{v:.4f} pts NAV ({v/nav_gross_pr.get(d, 100)*100:.2f}% de NAV)" for d, v in sorted(_dist.items())})
 

@@ -893,7 +893,7 @@ def _build_excel_complet(_cache_key = ""):
     _la  = load_json(os.path.join(BRVM30_DIR, "launch_state.json")) or {}
     _ih  = load_json(os.path.join(BRVM30_DIR, "nav_intraday_history.json")) or {}
     _ina = load_json(os.path.join(BRVM30_DIR, "intraday_nav.json")) or {}
-    _launch_date = _la.get("launch_date", "2026-01-01")
+    _launch_date = _la.get("launch_date") or "2026-01-01"
 
     output = _io.BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
@@ -1991,6 +1991,42 @@ def _render_backtest():
                 "date": "Date", "turnover": "Turnover", "cost_bps": "Coût (bps)",
                 "nav_after": "NAV après", "skipped": "Statut",
             }), width='stretch', hide_index=True)
+
+            # ── Mouvements de cote BRVMCI (introductions / suspensions) ──────
+            _rd_mv = load_json(os.path.join(BRVM30_DIR, "rebal_detail.json")) or {}
+            _rebals_mv = _rd_mv.get("rebalancings", [])[1:]  # skip initial construction
+            _all_ent = [e for r in _rebals_mv for e in r.get("entries", [])]
+            _all_ex  = [e for r in _rebals_mv for e in r.get("exits",   [])]
+            _mv_actifs = [r for r in _rebals_mv if r.get("entries") or r.get("exits")]
+
+            if _mv_actifs:
+                st.markdown("---")
+                _section("Mouvements de cote BRVMCI — introductions & suspensions")
+                _cm1, _cm2, _cm3 = st.columns(3)
+                _cm1.metric("Introductions / réintégrations", len(_all_ent))
+                _cm2.metric("Radiations / suspensions",       len(_all_ex))
+                _cm3.metric("Trimestres avec mouvements",     len(_mv_actifs))
+
+                _CHIP_IN  = "background:#d1fae5;color:#065f46;border:1px solid #6ee7b7"
+                _CHIP_OUT = "background:#fee2e2;color:#991b1b;border:1px solid #fca5a5"
+                _chip_style = "display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.72rem;font-weight:600;margin:2px"
+
+                for _rmv in _mv_actifs:
+                    _dt_lbl = pd.Timestamp(_rmv["date"]).strftime("%d/%m/%Y")
+                    _ent = _rmv.get("entries", [])
+                    _ex  = _rmv.get("exits",   [])
+                    _nb  = _rmv.get("basket_n", "?")
+                    with st.expander(f"{_dt_lbl}  ·  +{len(_ent)} entrant(s)  ·  -{len(_ex)} sortant(s)  ·  {_nb} titres dans l'indice"):
+                        _html_parts = []
+                        if _ent:
+                            _html_parts.append("<div style='margin-bottom:6px'><span style='font-size:0.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.1em'>Introductions&nbsp;/&nbsp;réintégrations</span><br>")
+                            _html_parts.append("".join(f"<span style='{_chip_style};{_CHIP_IN}'>▲ {t}</span>" for t in sorted(_ent)))
+                            _html_parts.append("</div>")
+                        if _ex:
+                            _html_parts.append("<div><span style='font-size:0.7rem;color:#6b7280;text-transform:uppercase;letter-spacing:.1em'>Radiations&nbsp;/&nbsp;suspensions</span><br>")
+                            _html_parts.append("".join(f"<span style='{_chip_style};{_CHIP_OUT}'>▼ {t}</span>" for t in sorted(_ex)))
+                            _html_parts.append("</div>")
+                        st.markdown("".join(_html_parts), unsafe_allow_html=True)
 
     # ── Stress Tests ──────────────────────────────────────────────────────────
     elif _bsec == "stress":
