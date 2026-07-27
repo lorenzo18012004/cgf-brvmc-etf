@@ -3,7 +3,7 @@
     {
       "name": "Mensuel dérive 1% (référence)",
       "te": 0.019428,
-      "td": -0.027967,
+      "td": -0.027966,
       "turnover": 0.02258
     },
     {
@@ -41,7 +41,7 @@
     {
       "threshold": 0.01,
       "te": 0.019928,
-      "td": -0.021898,
+      "td": -0.021897,
       "turnover": 0.045897,
       "n_large_avg": 24
     },
@@ -90,9 +90,9 @@
   ],
   "bootstrap": {
     "n_sim": 500,
-    "te_med": 0.018262,
-    "te_p5": 0.014261,
-    "te_p95": 0.022674
+    "te_med": 0.018263,
+    "te_p5": 0.014263,
+    "te_p95": 0.022671
   },
   "walk_forward": [
     {
@@ -112,9 +112,9 @@
     {
       "label": "Jan–Déc 2025",
       "te_is": 0.016158,
-      "te_oos": 0.010503,
-      "td_oos": 0.003508,
-      "delta_te": -0.005655
+      "te_oos": 0.010573,
+      "td_oos": 0.003385,
+      "delta_te": -0.005585
     },
     {
       "label": "2023–2024 IS/2025 OOS",
@@ -126,20 +126,21 @@
     {
       "label": "2023–2025 IS/2026 OOS",
       "te_is": 0.014176,
-      "te_oos": 0.010503,
-      "td_oos": 0.003508,
-      "delta_te": -0.003673
+      "te_oos": 0.010573,
+      "td_oos": 0.003385,
+      "delta_te": -0.003603
     }
   ],
   "selection_params": {
     "methode": "Hybride OTC top-N + ADV-cap redistribution",
     "force_top_n": 5,
-    "force_top_n_note": "Top 5 titres BRVM30 tenus à leur poids exact via OTC (no ADV constraint)",
+    "force_top_n_note": "Top 5 titres BRVMCI tenus à leur poids exact via OTC (no ADV constraint)",
     "max_exec_large_days": 40,
     "max_exec_small_days": 20,
     "large_threshold_pct": 3.0,
     "participation_rate_pct": 15.0,
     "min_adv_mfcfa": 0.5,
+    "min_index_weight_pct": 0.1,
     "min_basket_weight_pct": 0.1,
     "rebal_cible_freq": "trimestriel (jan/avr/jul/oct)",
     "rebal_execution_freq": "mensuel avec seuil de dérive",

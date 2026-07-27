@@ -2,12 +2,13 @@
   "selection_params": {
     "methode": "Hybride OTC top-N + ADV-cap redistribution",
     "force_top_n": 5,
-    "force_top_n_note": "Top 5 titres BRVM30 tenus à leur poids exact via OTC (no ADV constraint)",
+    "force_top_n_note": "Top 5 titres BRVMCI tenus à leur poids exact via OTC (no ADV constraint)",
     "max_exec_large_days": 40,
     "max_exec_small_days": 20,
     "large_threshold_pct": 3.0,
     "participation_rate_pct": 15.0,
     "min_adv_mfcfa": 0.5,
+    "min_index_weight_pct": 0.1,
     "min_basket_weight_pct": 0.1,
     "rebal_cible_freq": "trimestriel (jan/avr/jul/oct)",
     "rebal_execution_freq": "mensuel avec seuil de dérive",
@@ -29,11 +30,11 @@
     "cash_buffer_note": "1% du NAV en cash, capitalisé au RF 3%/an"
   },
   "te_full": 0.018742,
-  "te_prog": 0.01795,
-  "td_full": 0.02919,
-  "td_full_ann": 0.008123,
-  "td_gross": 0.052128,
-  "td_gross_ann": 0.014391,
+  "te_prog": 0.018049,
+  "td_full": 0.028924,
+  "td_full_ann": 0.00805,
+  "td_gross": 0.051856,
+  "td_gross_ann": 0.014317,
   "turnover_avg": 0.045232,
   "annual": [
     {
@@ -65,12 +66,12 @@
     },
     {
       "year": 2026,
-      "te": 0.034326,
-      "td": -0.005512,
-      "td_gross": -0.00211,
+      "te": 0.034322,
+      "td": -0.00577,
+      "td_gross": -0.002369,
       "cost_tx": 0,
       "mgmt_fee": 0,
-      "basket_gap": -0.00211
+      "basket_gap": -0.002369
     }
   ]
 }
