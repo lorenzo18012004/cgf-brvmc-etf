@@ -538,6 +538,41 @@ def _gh_save_verified(data, sha=None):
         return True
     except Exception:
         return False
+_MOVEMENTS_GH_PATH = "data/brvmci_movements.json"
+
+def _gh_get_movements():
+    """Lit brvmci_movements.json depuis l'API GitHub. Retourne (dict, sha)."""
+    if not _GITHUB_TOKEN or not _GITHUB_REPO:
+        return None, None
+    try:
+        import requests as _r
+        h = {"Authorization": f"token {_GITHUB_TOKEN}", "User-Agent": "cgf-dashboard"}
+        resp = _r.get(f"https://api.github.com/repos/{_GITHUB_REPO}/contents/{_MOVEMENTS_GH_PATH}", headers=h, timeout=10)
+        if resp.status_code == 404:
+            return {"movements": []}, None
+        resp.raise_for_status()
+        d = resp.json()
+        return json.loads(base64.b64decode(d["content"]).decode("utf-8")), d["sha"]
+    except Exception:
+        return None, None
+
+def _gh_save_movements(data, sha=None):
+    """Écrit brvmci_movements.json sur GitHub via l'API."""
+    if not _GITHUB_TOKEN or not _GITHUB_REPO:
+        return False
+    try:
+        import requests as _r
+        h = {"Authorization": f"token {_GITHUB_TOKEN}", "User-Agent": "cgf-dashboard", "Content-Type": "application/json"}
+        content_b64 = base64.b64encode(json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")).decode("ascii")
+        body = {"message": "data: mise à jour mouvements BRVMCI", "content": content_b64}
+        if sha:
+            body["sha"] = sha
+        resp = _r.put(f"https://api.github.com/repos/{_GITHUB_REPO}/contents/{_MOVEMENTS_GH_PATH}", headers=h, json=body, timeout=15)
+        resp.raise_for_status()
+        return True
+    except Exception:
+        return False
+
 _LIVE_FILES = {
     "nav_latest.json", "intraday_nav.json", "dashboard_data.json",
     "rebal_detail.json", "backtest_metrics.json", "launch_state.json",
@@ -1993,7 +2028,12 @@ def _render_backtest():
             }), width='stretch', hide_index=True)
 
             # ── Mouvements de cote BRVMCI (saisis manuellement) ──────────────
-            _mv_data = load_json(os.path.join(BRVM30_DIR, "brvmci_movements.json")) or {}
+            # Lecture : GitHub API si token dispo, sinon fichier local
+            _mv_gh_data, _mv_sha = _gh_get_movements()
+            if _mv_gh_data is not None:
+                _mv_data = _mv_gh_data
+            else:
+                _mv_data = load_json(os.path.join(BRVM30_DIR, "brvmci_movements.json")) or {}
             _mvs = sorted(_mv_data.get("movements", []), key=lambda x: x.get("date", ""))
             _intros = [m for m in _mvs if m.get("type") == "introduction"]
             _sorties = [m for m in _mvs if m.get("type") in ("radiation", "suspension")]
@@ -2004,28 +2044,63 @@ def _render_backtest():
             _cm1.metric("Introductions", len(_intros))
             _cm2.metric("Radiations / suspensions", len(_sorties))
 
-            if _mvs:
-                _CHIP_IN  = "background:#d1fae5;color:#065f46;border:1px solid #6ee7b7"
-                _CHIP_OUT = "background:#fee2e2;color:#991b1b;border:1px solid #fca5a5"
-                _CHIP_SUS = "background:#fef3c7;color:#92400e;border:1px solid #fcd34d"
-                _chip_style = "display:inline-block;padding:3px 10px;border-radius:4px;font-size:0.75rem;font-weight:600;margin:3px"
+            _TYPE_LABELS = {"introduction": "Introduction", "radiation": "Radiation", "suspension": "Suspension"}
 
-                _mv_rows = []
-                for _m in _mvs:
-                    _t    = _m.get("type", "")
-                    _chip = _CHIP_IN if _t == "introduction" else (_CHIP_SUS if _t == "suspension" else _CHIP_OUT)
-                    _sym  = "▲" if _t == "introduction" else "▼"
-                    _lbl  = {"introduction": "Introduction", "radiation": "Radiation", "suspension": "Suspension"}.get(_t, _t.capitalize())
-                    _mv_rows.append({
-                        "Date":   pd.Timestamp(_m["date"]).strftime("%d/%m/%Y"),
-                        "Ticker": _m.get("ticker", ""),
-                        "Nom":    _m.get("nom", ""),
-                        "Type":   _lbl,
-                        "Note":   _m.get("note", ""),
-                    })
-                st.dataframe(pd.DataFrame(_mv_rows), width='stretch', hide_index=True)
+            if _mvs:
+                # Tableau avec boutons de suppression
+                for _mi, _m in enumerate(_mvs):
+                    _t   = _m.get("type", "")
+                    _lbl = _TYPE_LABELS.get(_t, _t.capitalize())
+                    _col_d, _col_t, _col_n, _col_tp, _col_nt, _col_del = st.columns([1.4, 1, 2, 1.4, 2.5, 0.7])
+                    _col_d.write(pd.Timestamp(_m["date"]).strftime("%d/%m/%Y"))
+                    _col_t.write(f"**{_m.get('ticker','')}**")
+                    _col_n.write(_m.get("nom", ""))
+                    _col_tp.write(_lbl)
+                    _col_nt.write(_m.get("note", ""))
+                    if _col_del.button("🗑", key=f"del_mv_{_mi}", help="Supprimer"):
+                        _new_mvs = [x for j, x in enumerate(_mvs) if j != _mi]
+                        _payload = {"movements": _new_mvs}
+                        if _gh_save_movements(_payload, _mv_sha):
+                            st.success("Mouvement supprimé.")
+                            st.rerun()
+                        else:
+                            st.error("Erreur : token GitHub non configuré ou problème réseau.")
             else:
-                st.caption("Aucun mouvement enregistré. Éditez `data/brvmci_movements.json` pour en ajouter.")
+                st.caption("Aucun mouvement enregistré pour l'instant.")
+
+            # Formulaire d'ajout
+            st.markdown("---")
+            with st.expander("➕ Ajouter un mouvement", expanded=False):
+                with st.form("form_add_movement", clear_on_submit=True):
+                    _fa_c1, _fa_c2, _fa_c3 = st.columns([1.5, 1.5, 2])
+                    _fa_date   = _fa_c1.date_input("Date", value=pd.Timestamp("today"))
+                    _fa_type   = _fa_c2.selectbox("Type", ["introduction", "radiation", "suspension"],
+                                                   format_func=lambda x: _TYPE_LABELS[x])
+                    _fa_ticker = _fa_c3.text_input("Ticker (ex: LNBB)")
+                    _fa_c4, _fa_c5 = st.columns([2, 3])
+                    _fa_nom    = _fa_c4.text_input("Nom complet (optionnel)")
+                    _fa_note   = _fa_c5.text_input("Note (optionnel)")
+                    _fa_submit = st.form_submit_button("Enregistrer", type="primary")
+
+                if _fa_submit:
+                    if not _fa_ticker.strip():
+                        st.warning("Le ticker est obligatoire.")
+                    else:
+                        _new_entry = {
+                            "date":   str(_fa_date),
+                            "type":   _fa_type,
+                            "ticker": _fa_ticker.strip().upper(),
+                            "nom":    _fa_nom.strip(),
+                            "note":   _fa_note.strip(),
+                        }
+                        _all_mvs = list(_mvs) + [_new_entry]
+                        _all_mvs.sort(key=lambda x: x.get("date", ""))
+                        _payload = {"movements": _all_mvs}
+                        if _gh_save_movements(_payload, _mv_sha):
+                            st.success(f"Mouvement {_TYPE_LABELS[_fa_type].lower()} de **{_new_entry['ticker']}** ajouté.")
+                            st.rerun()
+                        else:
+                            st.error("Erreur : token GitHub non configuré ou problème réseau.")
 
     # ── Stress Tests ──────────────────────────────────────────────────────────
     elif _bsec == "stress":
