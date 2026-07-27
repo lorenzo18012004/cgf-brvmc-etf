@@ -1,8 +1,16 @@
-name: iNAV 5min (BRVM heures de marche)
+name: iNAV BRVMC (heures de marche)
 
 on:
   schedule:
     - cron: '30 9 * * 1-5'
+    - cron: '40 9 * * 1-5'
+    - cron: '50 9 * * 1-5'
+    - cron: '0,10,20,30,40,50 10 * * 1-5'
+    - cron: '0,10,20,30,40,50 11 * * 1-5'
+    - cron: '0,10,20,30,40,50 12 * * 1-5'
+    - cron: '0,10,20,30,40,50 13 * * 1-5'
+    - cron: '0,10,20,30,40,50 14 * * 1-5'
+    - cron: '0,10,20,30 15 * * 1-5'
   push:
     paths:
       - 'data/intraday_nav.json'
@@ -86,13 +94,17 @@ jobs:
         if: steps.check_hours.outputs.market_open == 'true'
         run: python scripts/scrape_intraday_cloud.py
 
+      - name: Mettre a jour NAV quotidienne
+        if: steps.check_hours.outputs.market_open == 'true'
+        run: python scripts/calc_nav_cloud.py
+
       - name: Commit et push (PAT pour declencher boucle)
         if: steps.check_hours.outputs.market_open == 'true'
         run: |
           git config user.name "cgf-bot"
           git config user.email "bot@cgf-bourse.ci"
-          git add data/intraday_nav.json data/nav_intraday_history.json data/launch_state.json
-          git diff --staged --quiet || git commit -m "iNAV cloud: snapshot $(date -u +'%Y-%m-%d %H:%M') UTC"
+          git add data/intraday_nav.json data/nav_intraday_history.json data/launch_state.json data/nav_latest.json
+          git diff --staged --quiet || git commit -m "iNAV BRVMC: snapshot $(date -u +'%Y-%m-%d %H:%M') UTC"
           for i in 1 2 3 4 5; do
             git pull --rebase origin main && git push && break
             echo "Push echoue (tentative $i/5), retry dans 10s..."
