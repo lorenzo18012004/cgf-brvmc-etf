@@ -1,6 +1,6 @@
 {
   "etf_name": "CGF BRVMC ETF",
-  "calc_date": null,
+  "calc_date": "2026-07-28",
   "calc_timestamp": "2026-06-16 09:09",
   "data_age_cal_days": null,
   "data_age_biz_days": null,
@@ -8,16 +8,16 @@
   "last_rebal_date": "2026-04-01",
   "n_basket": 44,
   "launch_date": "2026-06-19",
-  "launched": false,
-  "nav_indice": 18838.7173,
+  "launched": true,
+  "nav_indice": 18838.2863,
   "par_fcfa": 100000,
-  "vl_par_part_fcfa": 100000,
+  "vl_par_part_fcfa": 99560.0,
   "n_parts": 50000,
-  "aum_mfcfa": 5000.0,
+  "aum_mfcfa": 4978.0,
   "perf_ytd": null,
   "perf_3m": null,
   "perf_1y": null,
-  "perf_since_launch": null,
+  "perf_since_launch": -0.4398,
   "perf_backtest_total": 140.33,
   "vol_ann_pct": 9.69,
   "max_drawdown_pct": -7.56,
@@ -25,266 +25,266 @@
   "basket": [
     {
       "ticker": "SNTS",
-      "poids_pct": 17.4299,
-      "dernier_prix": 31495,
+      "poids_pct": 19.1392,
+      "dernier_prix": 31495.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "ORAC",
-      "poids_pct": 13.5068,
-      "dernier_prix": 16200,
+      "poids_pct": 15.1131,
+      "dernier_prix": 16200.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SGBC",
-      "poids_pct": 6.5771,
-      "dernier_prix": 38200,
+      "poids_pct": 7.0837,
+      "dernier_prix": 38200.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "ECOC",
-      "poids_pct": 4.9355,
-      "dernier_prix": 16200,
+      "poids_pct": 5.9948,
+      "dernier_prix": 16200.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SIBC",
-      "poids_pct": 4.9254,
-      "dernier_prix": 8900,
+      "poids_pct": 4.5538,
+      "dernier_prix": 8900.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SLBC",
-      "poids_pct": 3.5979,
-      "dernier_prix": 39495,
+      "poids_pct": 4.2369,
+      "dernier_prix": 39495.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "ETIT",
-      "poids_pct": 7.306,
-      "dernier_prix": 73,
+      "poids_pct": 3.9386,
+      "dernier_prix": 73.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "CBIBF",
-      "poids_pct": 4.7815,
-      "dernier_prix": 27000,
+      "poids_pct": 2.925,
+      "dernier_prix": 27000.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BICC",
-      "poids_pct": 2.6108,
-      "dernier_prix": 28305,
+      "poids_pct": 2.6674,
+      "dernier_prix": 28305.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "STBC",
-      "poids_pct": 2.3048,
-      "dernier_prix": 23195,
+      "poids_pct": 2.4885,
+      "dernier_prix": 23195.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "NSBC",
-      "poids_pct": 3.1484,
-      "dernier_prix": 23000,
+      "poids_pct": 2.3017,
+      "dernier_prix": 23000.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BOAC",
-      "poids_pct": 2.2258,
-      "dernier_prix": 10055,
+      "poids_pct": 2.2439,
+      "dernier_prix": 10055.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BOAB",
-      "poids_pct": 1.9506,
-      "dernier_prix": 8690,
+      "poids_pct": 2.0344,
+      "dernier_prix": 8690.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BICB",
-      "poids_pct": 2.4342,
-      "dernier_prix": 7615,
+      "poids_pct": 1.9632,
+      "dernier_prix": 7615.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "CFAC",
-      "poids_pct": 1.6863,
-      "dernier_prix": 1680,
+      "poids_pct": 1.9392,
+      "dernier_prix": 1680.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "NTLC",
-      "poids_pct": 2.0031,
-      "dernier_prix": 16400,
+      "poids_pct": 1.8207,
+      "dernier_prix": 16400.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "ORGT",
-      "poids_pct": 1.0295,
-      "dernier_prix": 2680,
+      "poids_pct": 1.6767,
+      "dernier_prix": 2680.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BOAS",
-      "poids_pct": 1.554,
-      "dernier_prix": 7800,
+      "poids_pct": 1.612,
+      "dernier_prix": 7800.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BOABF",
-      "poids_pct": 1.7532,
-      "dernier_prix": 7200,
+      "poids_pct": 1.6116,
+      "dernier_prix": 7200.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "ONTBF",
-      "poids_pct": 1.0537,
-      "dernier_prix": 2800,
+      "poids_pct": 1.3194,
+      "dernier_prix": 2800.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "CIEC",
-      "poids_pct": 1.6705,
-      "dernier_prix": 5390,
+      "poids_pct": 1.2566,
+      "dernier_prix": 5390.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SPHC",
-      "poids_pct": 1.0608,
-      "dernier_prix": 7500,
+      "poids_pct": 1.174,
+      "dernier_prix": 7500.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "TTLC",
-      "poids_pct": 1.0435,
-      "dernier_prix": 2995,
+      "poids_pct": 1.1302,
+      "dernier_prix": 2995.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SOGC",
-      "poids_pct": 0.9821,
-      "dernier_prix": 8215,
+      "poids_pct": 1.112,
+      "dernier_prix": 8215.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SHEC",
-      "poids_pct": 0.7339,
-      "dernier_prix": 2105,
+      "poids_pct": 0.9085,
+      "dernier_prix": 2105.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BOAM",
-      "poids_pct": 0.8508,
-      "dernier_prix": 5600,
+      "poids_pct": 0.8479,
+      "dernier_prix": 5600.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "PALC",
-      "poids_pct": 0.7572,
-      "dernier_prix": 8850,
+      "poids_pct": 0.8244,
+      "dernier_prix": 8850.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "TTLS",
-      "poids_pct": 0.676,
-      "dernier_prix": 3750,
+      "poids_pct": 0.6987,
+      "dernier_prix": 3750.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SDSC",
-      "poids_pct": 0.8345,
-      "dernier_prix": 2770,
+      "poids_pct": 0.6916,
+      "dernier_prix": 2770.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SMBC",
-      "poids_pct": 0.6901,
-      "dernier_prix": 15995,
+      "poids_pct": 0.6431,
+      "dernier_prix": 15995.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "LNBB",
-      "poids_pct": 0.4765,
-      "dernier_prix": 4305,
+      "poids_pct": 0.5174,
+      "dernier_prix": 4305.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SDCC",
-      "poids_pct": 0.5891,
-      "dernier_prix": 11825,
+      "poids_pct": 0.4396,
+      "dernier_prix": 11825.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SAFC",
-      "poids_pct": 0.2067,
-      "dernier_prix": 4600,
+      "poids_pct": 0.4049,
+      "dernier_prix": 4600.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "BOAN",
-      "poids_pct": 0.61,
-      "dernier_prix": 5300,
+      "poids_pct": 0.3706,
+      "dernier_prix": 5300.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "PRSC",
-      "poids_pct": 0.2593,
-      "dernier_prix": 4575,
+      "poids_pct": 0.3298,
+      "dernier_prix": 4575.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SEMC",
-      "poids_pct": 0.2091,
-      "dernier_prix": 1500,
+      "poids_pct": 0.3283,
+      "dernier_prix": 1500.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "UNXC",
-      "poids_pct": 0.2125,
-      "dernier_prix": 1850,
+      "poids_pct": 0.2705,
+      "dernier_prix": 1850.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "ABJC",
-      "poids_pct": 0.1899,
-      "dernier_prix": 3145,
+      "poids_pct": 0.2614,
+      "dernier_prix": 3145.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "STAC",
-      "poids_pct": 0.2157,
-      "dernier_prix": 2900,
+      "poids_pct": 0.2595,
+      "dernier_prix": 2900.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SCRC",
-      "poids_pct": 0.3791,
-      "dernier_prix": 3495,
+      "poids_pct": 0.2238,
+      "dernier_prix": 3495.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "FTSC",
-      "poids_pct": 0.1542,
-      "dernier_prix": 1975,
+      "poids_pct": 0.2141,
+      "dernier_prix": 1975.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "SIVC",
-      "poids_pct": 0.1063,
-      "dernier_prix": 2200,
+      "poids_pct": 0.1683,
+      "dernier_prix": 2200.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "CABC",
-      "poids_pct": 0.1229,
-      "dernier_prix": 3750,
+      "poids_pct": 0.1428,
+      "dernier_prix": 3750.0,
       "last_price_date": "2026-07-24"
     },
     {
       "ticker": "NEIC",
-      "poids_pct": 0.1546,
-      "dernier_prix": 2190,
+      "poids_pct": 0.1183,
+      "dernier_prix": 2190.0,
       "last_price_date": "2026-07-24"
     }
   ],
@@ -3766,9 +3766,14 @@
       240.327718
     ]
   ],
-  "nav_live_series": [],
-  "change_day_pct": null,
-  "source": "init",
-  "n_live_prices": 30,
+  "nav_live_series": [
+    [
+      "2026-07-28",
+      99560.0
+    ]
+  ],
+  "change_day_pct": 0.0001,
+  "source": "cloud_fallback_sika",
+  "n_live_prices": 44,
   "cash_buffer_pct": 1.0
 }
