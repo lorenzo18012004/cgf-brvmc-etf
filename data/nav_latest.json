@@ -5,7 +5,7 @@
   "data_age_cal_days": null,
   "data_age_biz_days": null,
   "stale_warning": false,
-  "last_rebal_date": "2026-07-28",
+  "last_rebal_date": "2026-07-29",
   "n_basket": 44,
   "launch_date": "2026-06-19",
   "launched": false,
@@ -4030,12 +4030,7 @@
       236.7575
     ]
   ],
-  "nav_live_series": [
-    [
-      "2026-07-28",
-      99376.0
-    ]
-  ],
+  "nav_live_series": [],
   "change_day_pct": null,
   "source": "cloud_fallback_sika",
   "n_live_prices": 44,
