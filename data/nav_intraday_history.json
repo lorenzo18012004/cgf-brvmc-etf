@@ -1,1 +1,17 @@
-{}
+{
+  "2026-07-29": [
+    {
+      "time": "11:42",
+      "vl": 100000.0,
+      "vl_fcfa": 100000.0,
+      "nav_indice": 18827.3268,
+      "brvm30_official": 229.32,
+      "brvm30_star": 18923.0142,
+      "perf_since_launch": -0.0,
+      "change_1d_pct": -0.0556,
+      "change_day_pct": 0.0,
+      "aum_mfcfa": 5000.0,
+      "n_prices": 44
+    }
+  ]
+}

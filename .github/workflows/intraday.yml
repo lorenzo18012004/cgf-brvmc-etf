@@ -92,7 +92,10 @@ jobs:
 
       - name: Calculer iNAV
         if: steps.check_hours.outputs.market_open == 'true'
-        run: python scripts/scrape_intraday_cloud.py
+        run: |
+          python scripts/scrape_intraday_cloud.py
+          echo "--- Etat intraday_nav.json apres scraper ---"
+          python3 -c "import json; d=json.load(open('data/intraday_nav.json',encoding='utf-8')); print('date:',d.get('date'),'| snapshots:',len(d.get('snapshots',[])))"
 
       - name: Mettre a jour NAV quotidienne
         if: steps.check_hours.outputs.market_open == 'true'
