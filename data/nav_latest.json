@@ -7,17 +7,17 @@
   "stale_warning": false,
   "last_rebal_date": "2026-07-29",
   "n_basket": 30,
-  "launch_date": "2026-06-19",
-  "launched": true,
+  "launch_date": "2026-07-30",
+  "launched": false,
   "nav_indice": 18833.6673,
   "par_fcfa": 100000,
-  "vl_par_part_fcfa": 100234.0,
+  "vl_par_part_fcfa": 100000,
   "n_parts": 50000,
-  "aum_mfcfa": 5001.7,
+  "aum_mfcfa": 5000.0,
   "perf_ytd": null,
   "perf_3m": null,
   "perf_1y": null,
-  "perf_since_launch": 0.2341,
+  "perf_since_launch": null,
   "perf_backtest_total": 136.76,
   "vol_ann_pct": 8.63,
   "max_drawdown_pct": -5.94,
@@ -4022,14 +4022,9 @@
       236.7575
     ]
   ],
-  "nav_live_series": [
-    [
-      "2026-07-29",
-      100234.0
-    ]
-  ],
-  "change_day_pct": 0.1808,
-  "source": "cloud_fallback_sika",
-  "n_live_prices": 44,
+  "nav_live_series": [],
+  "change_day_pct": 0,
+  "source": "reset_pre_launch",
+  "n_live_prices": 0,
   "cash_buffer_pct": 1.0
 }
