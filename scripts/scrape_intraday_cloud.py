@@ -123,9 +123,23 @@ class IntradayScraperCloud(BaseScript):
                 _n_parts    = _nl.get("n_parts", 50000)
                 if _ls:
                     _ls["nav_index_at_launch"] = round(_nav_anchor, 6)
-                    with open(os.path.join(self.data_dir, "launch_state.json"), "w", encoding="utf-8") as _fw:
+                    with open(launch_path, "w", encoding="utf-8") as _fw:
                         json.dump(_ls, _fw, ensure_ascii=False, indent=2)
                     print(f"[LANCEMENT] nav_index_at_launch fixé à {_nav_anchor:.6f}")
+                else:
+                    # Fichier absent → créer launch_state.json au premier run
+                    _ls_new = {
+                        "launch_date":         today_str,
+                        "par_fcfa":            100000,
+                        "n_parts":             _n_parts,
+                        "aum_initial_mfcfa":   round(_par * _n_parts / 1_000_000, 1),
+                        "nav_index_at_launch": round(_nav_anchor, 6),
+                        "created_at":          now_utc.strftime("%Y-%m-%d %H:%M"),
+                        "launch_time_utc":     now_utc.strftime("%H:%M"),
+                    }
+                    with open(launch_path, "w", encoding="utf-8") as _fw:
+                        json.dump(_ls_new, _fw, ensure_ascii=False, indent=2)
+                    print(f"[LANCEMENT] launch_state.json créé — nav_index_at_launch={_nav_anchor:.6f}")
 
             nav_result = {
                 "nav_indice":       round(_nav_live, 4),
