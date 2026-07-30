@@ -1,7 +1,31 @@
 {
-  "updated_at": "2026-07-02T00:00:00",
-  "dividend_receivable_fcfa": 0.0,
-  "distribution_payable_fcfa": 0.0,
+  "updated_at": "2026-07-30T17:23:14.827060+00:00",
+  "dividend_receivable_fcfa": 13630882.0,
+  "distribution_payable_fcfa": 13630882.0,
   "poche_distribution_fcfa": 0.0,
-  "evenements": []
+  "evenements": [
+    {
+      "id": "SIBC_2026-07-30",
+      "ticker": "SIBC",
+      "nom": "SOCIETE IVOIRIENNE DE BANQUE CI",
+      "ex_date": "2026-07-30",
+      "montant_par_action_fcfa": 425.0,
+      "nb_titres_etf": 32073.0,
+      "montant_total_fcfa": 13630882.0,
+      "montant_par_part_fcfa": 272.6176,
+      "payment_date": null,
+      "distribution_date": "2026-09-30",
+      "status": "accrued",
+      "journal": [
+        {
+          "date": "2026-07-30",
+          "type": "ACCRUAL",
+          "debit": "Dividend_Receivable",
+          "credit": "Distribution_Payable",
+          "montant_fcfa": 13630882.0,
+          "note": "Provisionnement ex-date SIBC — 425.00 FCFA/action"
+        }
+      ]
+    }
+  ]
 }
