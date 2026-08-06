@@ -71,5 +71,13 @@
       "mgmt_fee": 0,
       "basket_gap": 0.003882
     }
-  ]
+  ],
+  "start_label": "2023-01-02",
+  "end_label": "2026-07-29",
+  "n_years": 3.57,
+  "n_rebal": 15,
+  "n_titres_avg": 39.4,
+  "n_titres_min": 30,
+  "n_titres_max": 45,
+  "mgmt_fee_ann": 0.006
 }

@@ -720,7 +720,17 @@ if _rebal_log:
 json.dump(dd, open(DD_PATH, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 
 # Mise à jour backtest_metrics.json avec les paramètres de sélection
+_n_titres_list  = [len(w_history.get(d, {})) for d in rebal_dates]
+_n_years_bt     = (len(all_dates) / 252) if all_dates else 0
 bm.update({
+    'start_label':   all_dates[0]  if all_dates else START_DATE,
+    'end_label':     all_dates[-1] if all_dates else END_DATE,
+    'n_years':       round(_n_years_bt, 2),
+    'n_rebal':       len(rebal_dates),
+    'n_titres_avg':  round(sum(_n_titres_list) / len(_n_titres_list), 1) if _n_titres_list else 0,
+    'n_titres_min':  min(_n_titres_list) if _n_titres_list else 0,
+    'n_titres_max':  max(_n_titres_list) if _n_titres_list else 0,
+    'mgmt_fee_ann':  MGMT_FEE_ANN,
     'te_full': round(te_net, 6), 'te_prog': round(te_prog, 6),
     'td_full': round(td_net, 6), 'td_full_ann': round(td_net_ann, 6),
     'td_gross': round(td_gross, 6), 'td_gross_ann': round(td_gross_ann, 6),
