@@ -3166,20 +3166,22 @@ def _render_live():
                         if _dt > _t0 and _dt.weekday() < 5:
                             _idx_pts[_dt] = float(_bv) / _brvm30_at_launch * 100
                     # Fallback : jours manquants depuis le dernier snapshot intraday
+                    # Utilise nav_indice/nav_anch (même BRVMCI, échelle cohérente)
+                    # brvm30_official est le BRVM30 (~230), pas le BRVMCI (~485)
                     for _d, _snaps in intra_hist.items():
                         _dt = pd.Timestamp(_d).normalize()
                         if _dt in _idx_pts or _dt <= _t0 or _dt.weekday() >= 5 or not _snaps:
                             continue
                         for _s in reversed(_snaps):
-                            _v = _s.get("brvm30_official")
-                            if _v:
-                                _idx_pts[_dt] = float(_v) / _brvm30_at_launch * 100
+                            _v = _s.get("nav_indice")
+                            if _v and nav_anch:
+                                _idx_pts[_dt] = float(_v) / nav_anch * 100
                                 break
                     if intra_snaps:
-                        _bv_live = intra_snaps[-1].get("brvm30_official")
+                        _bv_live = intra_snaps[-1].get("nav_indice")
                         _dt = pd.Timestamp(intra_date).normalize()
-                        if _bv_live and _dt > _t0:
-                            _idx_pts[_dt] = float(_bv_live) / _brvm30_at_launch * 100
+                        if _bv_live and nav_anch and _dt > _t0:
+                            _idx_pts[_dt] = float(_bv_live) / nav_anch * 100
                 etf_s = pd.Series(_etf_pts).sort_index()
                 idx_s = pd.Series(_idx_pts).sort_index()
 
@@ -6446,23 +6448,23 @@ def _render_live():
                 _btn_lbl = (f"Marquer reçu — {_ev_btn['ticker']} "
                             f"({int(_ev_btn.get('montant_total_fcfa', 0) or 0):,} FCFA)")
                 if st.button(_btn_lbl, key=f"dsg_recv_{_ev_btn['id']}"):
-                    import subprocess as _sp_dsg
-                    _sp_dsg.run([
-                        sys.executable,
-                        os.path.join(BASE, "scripts", "check_corporate_actions.py"),
-                        "--record-payment", _ev_btn["ticker"], _ev_btn["ex_date"],
-                    ], capture_output=True)
+                    _scripts = os.path.join(BASE, "scripts")
+                    if _scripts not in sys.path:
+                        sys.path.insert(0, _scripts)
+                    from check_corporate_actions import CorporateActionsChecker as _CAC
+                    _CAC().record_payment_received(_ev_btn["ticker"], _ev_btn["ex_date"])
+                    load_json.clear()
                     st.rerun()
         if _received_dsg:
             _total_dsg = sum(e.get("montant_total_fcfa", 0) or 0 for e in _received_dsg)
             if st.button(f"Distribuer aux porteurs — {_total_dsg:,.0f} FCFA",
                          key="dsg_distribuer", type="primary"):
-                import subprocess as _sp_dist
-                _sp_dist.run([
-                    sys.executable,
-                    os.path.join(BASE, "scripts", "check_corporate_actions.py"),
-                    "--distribute",
-                ], capture_output=True)
+                _scripts = os.path.join(BASE, "scripts")
+                if _scripts not in sys.path:
+                    sys.path.insert(0, _scripts)
+                from check_corporate_actions import CorporateActionsChecker as _CAC
+                _CAC().record_distribution()
+                load_json.clear()
                 st.rerun()
 
 
