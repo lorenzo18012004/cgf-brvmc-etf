@@ -2859,18 +2859,19 @@ def _render_live():
 
             # ── Calcul TE / TD / MDD live (avant bandeau) ────────────────────
             import numpy as _np
-            _brvm30_hist_te      = load_json(os.path.join(BRVM30_DIR, "brvm30_index_history.json")) or {}
-            _brvm30_at_launch_te = float(_brvm30_hist_te[launch_date]) if launch_date and launch_date in _brvm30_hist_te else None
+            _brvmci_at_launch_te = float((launch or {}).get("nav_index_at_launch", 0)) or None
             _brvm30_now = None
-            if _brvm30_hist_te:
-                _te_snaps_early = (intraday or {}).get("snapshots", [])
-                if _te_snaps_early:
-                    _brvm30_now = _te_snaps_early[-1].get("brvm30_official")
-                if not _brvm30_now:
-                    _brvm30_now = _brvm30_hist_te.get(today_str)
-                if not _brvm30_now:
-                    _brvm30_now = float(_brvm30_hist_te[max(_brvm30_hist_te.keys())])
-            _perf_idx = (float(_brvm30_now) / _brvm30_at_launch_te - 1) * 100 if (_brvm30_now and _brvm30_at_launch_te) else None
+            _te_snaps_early = (intraday or {}).get("snapshots", [])
+            if _te_snaps_early:
+                _brvm30_now = _te_snaps_early[-1].get("nav_indice")
+            if not _brvm30_now:
+                _nih_fb = load_json(os.path.join(BRVM30_DIR, "nav_intraday_history.json")) or {}
+                if _nih_fb:
+                    _last_d_fb = max(_nih_fb.keys())
+                    _last_pts_fb = _nih_fb[_last_d_fb]
+                    if _last_pts_fb:
+                        _brvm30_now = _last_pts_fb[-1].get("nav_indice")
+            _perf_idx = (float(_brvm30_now) / _brvmci_at_launch_te - 1) * 100 if (_brvm30_now and _brvmci_at_launch_te) else None
 
             _launch_ts_te = pd.Timestamp(launch_date) if launch_date else pd.Timestamp("1900-01-01")
             _ih = load_json(os.path.join(BRVM30_DIR, "nav_intraday_history.json")) or {}
@@ -2880,18 +2881,15 @@ def _render_live():
                 if _pts and pd.Timestamp(_d) >= _launch_ts_te:
                     _lp = _pts[-1]
                     _vl = _lp.get("vl_fcfa") or _lp.get("vl")
-                    _bv = _lp.get("brvm30_official")
+                    _bv = _lp.get("nav_indice")
                     if _vl: _closes_etf[_d] = float(_vl)
-                    # Utiliser le BRVMCI du même snapshot que le VL (pas le lendemain matin)
                     if _bv:
                         _closes_idx[_d] = float(_bv)
-                    elif _d in _brvm30_hist_te:
-                        _closes_idx[_d] = float(_brvm30_hist_te[_d])
             _te_snaps = (intraday or {}).get("snapshots", [])
             if _te_snaps:
                 _ls = _te_snaps[-1]
                 _vl_now = _ls.get("vl_live_fcfa") or _ls.get("vl_par_part", 0)
-                _bv_now = _ls.get("brvm30_official")
+                _bv_now = _ls.get("nav_indice")
                 if _vl_now: _closes_etf[today_str] = float(_vl_now)
                 if _bv_now: _closes_idx[today_str] = float(_bv_now)
 
@@ -2907,10 +2905,10 @@ def _render_live():
                 if len(_common) >= 1:
                     _active = _ret_etf.loc[_common] - _ret_idx.loc[_common]
                     _te = float(_active.std(ddof=1) * _np.sqrt(252) * 100) if len(_common) >= 2 else float(abs(_active.iloc[0]) * _np.sqrt(252) * 100)
-                if _brvm30_at_launch_te and not _etf_cl.empty and not _idx_cl.empty:
+                if _brvmci_at_launch_te and not _etf_cl.empty and not _idx_cl.empty:
                     _par_te  = float((launch or {}).get("par_fcfa", 100000))
                     _etf_cum = _etf_cl.iloc[-1] / _par_te
-                    _idx_cum = _idx_cl.iloc[-1] / _brvm30_at_launch_te
+                    _idx_cum = _idx_cl.iloc[-1] / _brvmci_at_launch_te
                     _td = (_etf_cum / _idx_cum - 1) * 100
 
             _live_cagr = _live_sharpe = _live_maxdd = None
@@ -3121,13 +3119,7 @@ def _render_live():
                 _brvm30_hist = load_json(_brvm30_hist_path) or {}
                 # Valeur de référence = clôture officielle BRVMCI le jour du lancement
                 # Priorité à brvm30_index_history.json (clôture officielle) pour cohérence avec le KPI TD
-                _brvm30_at_launch = None
-                if _brvm30_hist and launch_date:
-                    _v = _brvm30_hist.get(launch_date)
-                    if _v:
-                        _brvm30_at_launch = float(_v)
-                if not _brvm30_at_launch:
-                    _brvm30_at_launch = (launch or {}).get("brvm30_index_at_launch")
+                _brvm30_at_launch = float((launch or {}).get("nav_index_at_launch", 0)) or None
 
                 # Construire série : dernier point par session >= launch_date uniquement
                 _launch_ts = pd.Timestamp(launch_date) if launch_date else pd.Timestamp("1900-01-01")
@@ -3222,16 +3214,10 @@ def _render_live():
                 _idx_pts = {}
                 if _brvm30_at_launch:
                     _idx_pts[_t0] = 100.0
-                    for _d, _bv in _brvm30_hist.items():
-                        _dt = pd.Timestamp(_d).normalize()
-                        if _dt > _t0 and _dt.weekday() < 5:
-                            _idx_pts[_dt] = float(_bv) / _brvm30_at_launch * 100
-                    # Fallback : jours manquants depuis le dernier snapshot intraday
-                    # Utilise nav_indice/nav_anch (même BRVMCI, échelle cohérente)
-                    # brvm30_official est le BRVM30 (~230), pas le BRVMCI (~485)
+                    # Source : nav_indice (BRVMCI officiel) depuis intra_hist
                     for _d, _snaps in intra_hist.items():
                         _dt = pd.Timestamp(_d).normalize()
-                        if _dt in _idx_pts or _dt <= _t0 or _dt.weekday() >= 5 or not _snaps:
+                        if _dt <= _t0 or _dt.weekday() >= 5 or not _snaps:
                             continue
                         for _s in reversed(_snaps):
                             _v = _s.get("nav_indice")
@@ -3293,19 +3279,13 @@ def _render_live():
                             _lp = _pts[-1]
                             _v  = _lp.get("vl_fcfa") or _lp.get("vl")
                             if _v: _raw_vl[_dt] = float(_v)
-                    # Indice BRVMC officiel depuis brvm30_index_history.json (jours ouvrés uniquement)
-                    for _d, _bv in _brvm30_hist.items():
-                        _dt = pd.Timestamp(_d).normalize()
-                        if _dt >= _t0 and _dt.weekday() < 5:
-                            _raw_ni[_dt] = float(_bv)
-                    # Fallback : jours manquants comblés depuis le dernier snapshot intraday
-                    # (couvre le délai de ~1 jour entre clôture du marché et workflow nocturne)
+                    # Indice BRVMCI depuis nav_intraday_history (nav_indice = valeur BRVMCI officielle)
                     for _d, _snaps in intra_hist.items():
                         _dt = pd.Timestamp(_d).normalize()
-                        if _dt in _raw_ni or _dt < _t0 or _dt.weekday() >= 5 or not _snaps:
+                        if _dt < _t0 or _dt.weekday() >= 5 or not _snaps:
                             continue
                         for _s in reversed(_snaps):
-                            _v = _s.get("brvm30_official")
+                            _v = _s.get("nav_indice")
                             if _v:
                                 _raw_ni[_dt] = float(_v)
                                 break
@@ -3320,7 +3300,7 @@ def _render_live():
                         _dt2 = pd.Timestamp(intra_date).normalize()
                         if _dt2 > _t0:
                             _v2 = _ls2.get("vl_live_fcfa") or (_ls2.get("nav_indice", 0) / nav_anch * par)
-                            _n2 = _ls2.get("brvm30_official")   # indice officiel BRVMCI, pas nav_indice
+                            _n2 = _ls2.get("nav_indice")
                             if _v2: _raw_vl[_dt2] = float(_v2)
                             if _n2: _raw_ni[_dt2] = float(_n2)
 
