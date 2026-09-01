@@ -1,6 +1,6 @@
 {
   "etf_name": "CGF BRVMC ETF",
-  "calc_date": "2026-08-31",
+  "calc_date": "2026-09-01",
   "calc_timestamp": "2026-06-16 09:09",
   "data_age_cal_days": null,
   "data_age_biz_days": null,
@@ -9,15 +9,15 @@
   "n_basket": 30,
   "launch_date": null,
   "launched": true,
-  "nav_indice": 21005.5748,
+  "nav_indice": 21005.0522,
   "par_fcfa": 100000,
-  "vl_par_part_fcfa": 111145.0,
+  "vl_par_part_fcfa": 111142.0,
   "n_parts": 50000,
-  "aum_mfcfa": 5557.2,
+  "aum_mfcfa": 5557.1,
   "perf_ytd": null,
   "perf_3m": null,
   "perf_1y": null,
-  "perf_since_launch": 11.1448,
+  "perf_since_launch": 11.142,
   "perf_backtest_total": 136.76,
   "vol_ann_pct": 8.63,
   "max_drawdown_pct": -5.94,
@@ -4114,9 +4114,13 @@
     [
       "2026-08-31",
       111145.0
+    ],
+    [
+      "2026-09-01",
+      111142.0
     ]
   ],
-  "change_day_pct": -0.1836,
+  "change_day_pct": -0.0001,
   "source": "cloud_fallback_sika",
   "n_live_prices": 30,
   "cash_buffer_pct": 1.0
