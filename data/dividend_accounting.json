@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-09-09T19:02:32.204911+00:00",
-  "dividend_receivable_fcfa": 73988449.0,
-  "distribution_payable_fcfa": 73988449.0,
+  "updated_at": "2026-09-15T19:29:36.857188+00:00",
+  "dividend_receivable_fcfa": 83142844.0,
+  "distribution_payable_fcfa": 83142844.0,
   "poche_distribution_fcfa": 0.0,
   "evenements": [
     {
@@ -116,6 +116,29 @@
           "credit": "Distribution_Payable",
           "montant_fcfa": 652724.0,
           "note": "Provisionnement ex-date NEIC — 159.54 FCFA/action"
+        }
+      ]
+    },
+    {
+      "id": "SDSC_2026-09-15",
+      "ticker": "SDSC",
+      "nom": "SODECI",
+      "ex_date": "2026-09-15",
+      "montant_par_action_fcfa": 525.0,
+      "nb_titres_etf": 17437.0,
+      "montant_total_fcfa": 9154395.0,
+      "montant_par_part_fcfa": 183.0879,
+      "payment_date": null,
+      "distribution_date": "2026-09-30",
+      "status": "accrued",
+      "journal": [
+        {
+          "date": "2026-09-15",
+          "type": "ACCRUAL",
+          "debit": "Dividend_Receivable",
+          "credit": "Distribution_Payable",
+          "montant_fcfa": 9154395.0,
+          "note": "Provisionnement ex-date SDSC — 525.00 FCFA/action"
         }
       ]
     }
