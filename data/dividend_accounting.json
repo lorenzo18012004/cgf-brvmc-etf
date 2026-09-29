@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-09-15T19:29:36.857188+00:00",
-  "dividend_receivable_fcfa": 83142844.0,
-  "distribution_payable_fcfa": 83142844.0,
+  "updated_at": "2026-09-29T20:25:38.000192+00:00",
+  "dividend_receivable_fcfa": 83737749.0,
+  "distribution_payable_fcfa": 83737749.0,
   "poche_distribution_fcfa": 0.0,
   "evenements": [
     {
@@ -139,6 +139,29 @@
           "credit": "Distribution_Payable",
           "montant_fcfa": 9154395.0,
           "note": "Provisionnement ex-date SDSC — 525.00 FCFA/action"
+        }
+      ]
+    },
+    {
+      "id": "SAFC_2026-09-29",
+      "ticker": "SAFC",
+      "nom": "SERVAIR ABIDJAN CI",
+      "ex_date": "2026-09-29",
+      "montant_par_action_fcfa": 229.0,
+      "nb_titres_etf": 2598.0,
+      "montant_total_fcfa": 594905.0,
+      "montant_par_part_fcfa": 11.8981,
+      "payment_date": null,
+      "distribution_date": "2026-09-30",
+      "status": "accrued",
+      "journal": [
+        {
+          "date": "2026-09-29",
+          "type": "ACCRUAL",
+          "debit": "Dividend_Receivable",
+          "credit": "Distribution_Payable",
+          "montant_fcfa": 594905.0,
+          "note": "Provisionnement ex-date SAFC — 229.00 FCFA/action"
         }
       ]
     }
