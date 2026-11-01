@@ -1,7 +1,7 @@
 {
-  "rebal_date": "2026-07-01",
-  "scrape_ts": "2026-07-24T14:10:07",
-  "n_tickers": 47,
+  "rebal_date": "2026-10-01",
+  "scrape_ts": "2026-11-01T13:53:37Z",
+  "n_tickers": 45,
   "composition": [
     "ABJC",
     "BICB",
@@ -33,11 +33,9 @@
     "SCRC",
     "SDCC",
     "SDSC",
-    "SEMC",
     "SGBC",
     "SHEC",
     "SIBC",
-    "SICC",
     "SIVC",
     "SLBC",
     "SMBC",
@@ -52,5 +50,8 @@
     "UNXC"
   ],
   "entries": [],
-  "exits": []
+  "exits": [
+    "SEMC",
+    "SICC"
+  ]
 }
